@@ -7,7 +7,9 @@ void GameManager::Initialize(AcademiaEngine* engineContext)
     _EngineContext = engineContext;
 
 #ifdef ACADEMIA_EXAMPLE
-    _ExampleObject.Position = { 0.0f, 0.0f };
+    std::shared_ptr<ExampleGameObject> exampleObject = _EngineContext->GetScene().Spawn<ExampleGameObject>();
+    exampleObject->Position = { 0.0f, 0.0f };
+    _ExampleObject = exampleObject;
 #endif
 }
 
@@ -25,13 +27,12 @@ void GameManager::Update(float elapsedTime)
     const olc::HWButton jumpButton = _EngineContext->GetKey(spaceKey);
     
     // Gameplay code
-#ifdef ACADEMIA_EXAMPLE
-    _ExampleObject.Update(elapsedTime);
-    _ExampleObject.Draw(*_EngineContext);
-#endif
+    // GameObjects spawned in the Scene are updated and drawn by the engine.
 }
 
 void GameManager::Uninitialize()
 {
-    // Empty for now :) 
+#ifdef ACADEMIA_EXAMPLE
+    _ExampleObject.reset();
+#endif
 }

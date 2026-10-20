@@ -161,6 +161,7 @@
     <ClCompile Include="external\olc\olcPGE_implementation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\Engine\AcademiaEngine.cpp" />
+    <ClCompile Include="src\Engine\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\GameManager.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="src\Game\ExampleGameObject.h" />
     <ClInclude Include="external\olc\olcPixelGameEngine.h" />
     <ClInclude Include="src\Engine\AcademiaEngine.h" />
+    <ClInclude Include="src\Engine\Scene.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -3,6 +3,7 @@
 
 #include "../../external/olc/olcPixelGameEngine.h"
 #include "../Utils.h"
+#include "Scene.h"
 
 class GameManager;
 
@@ -18,6 +19,8 @@ public:
     olc::vi2d ConvertWorldPositionToPixels(const olc::vf2d& worldPosition) const;
     olc::vf2d ConvertPixelsToWorldPosition(const olc::vi2d& pixelsPosition) const;
 
+    Scene& GetScene() { return _Scene; }
+
     static AcademiaEngine* Instantiate();
     static AcademiaEngine* GetInstance();
 
@@ -28,4 +31,5 @@ private:
     void PostUpdate(float elapsedTime);
 
     GameManagerPtr _GameManager = nullptr;
+    Scene _Scene;
 };

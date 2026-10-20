@@ -14,6 +14,9 @@ bool AcademiaEngine::OnUserCreate()
     _GameManager = std::make_shared<GameManager>();
     _GameManager->Initialize(this);
 
+    // Objects spawned during Initialize are live on the first frame
+    _Scene.FlushPending();
+
     return true;
 }
 
@@ -30,7 +33,10 @@ bool AcademiaEngine::OnUserDestroy()
 {
     if (_GameManager)
         _GameManager->Uninitialize();
-    
+
+    _Scene.Clear();
+    _Scene.FlushPending();
+
     return true;
 }
 
@@ -43,10 +49,14 @@ void AcademiaEngine::Update(float elapsedTime)
 {
     if(_GameManager)
         _GameManager->Update(elapsedTime);
+
+    _Scene.Update(elapsedTime);
+    _Scene.Draw(*this);
 }
 
 void AcademiaEngine::PostUpdate(float elapsedTime)
 {
+    _Scene.FlushPending();
 }
 
 olc::vi2d AcademiaEngine::ConvertWorldPositionToPixels(const olc::vf2d& worldPosition) const
