@@ -6,6 +6,7 @@ class ExampleGameObject : public GameObject
 public:
     void Draw(AcademiaEngine& engine) override;
 
-    float Radius = 20.0f;
+    // In world units
+    float Radius = 0.4f;
     olc::Pixel Color = olc::WHITE;
 };

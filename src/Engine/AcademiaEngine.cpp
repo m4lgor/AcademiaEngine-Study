@@ -61,16 +61,22 @@ void AcademiaEngine::PostUpdate(float elapsedTime)
 
 olc::vi2d AcademiaEngine::ConvertWorldPositionToPixels(const olc::vf2d& worldPosition) const
 {
-    int pixelx = static_cast<int>(worldPosition.x) + GetScreenSize().x / 2;
-    int pixely = -static_cast<int>(worldPosition.y) + GetScreenSize().y / 2;
-    return {pixelx, pixely};
+    return _Camera.WorldToScreen(worldPosition, GetScreenSize());
 }
 
 olc::vf2d AcademiaEngine::ConvertPixelsToWorldPosition(const olc::vi2d& pixelsPosition) const
 {
-    float positionx = static_cast<float>(pixelsPosition.x) - static_cast<float>(GetScreenSize().x) * 0.5f;
-    float positiony =  static_cast<float>(GetScreenSize().y) * 0.5f - static_cast<float>(pixelsPosition.y);
-    return {positionx, positiony};
+    return _Camera.ScreenToWorld(pixelsPosition, GetScreenSize());
+}
+
+float AcademiaEngine::ConvertWorldLengthToPixels(float worldLength) const
+{
+    return _Camera.WorldToScreenLength(worldLength);
+}
+
+float AcademiaEngine::ConvertPixelsToWorldLength(float pixelsLength) const
+{
+    return _Camera.ScreenToWorldLength(pixelsLength);
 }
 
 AcademiaEngine* AcademiaEngine::Instantiate()

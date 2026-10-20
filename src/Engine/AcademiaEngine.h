@@ -4,6 +4,7 @@
 #include "../../external/olc/olcPixelGameEngine.h"
 #include "../Utils.h"
 #include "Scene.h"
+#include "Camera.h"
 
 class GameManager;
 
@@ -18,8 +19,11 @@ public:
 
     olc::vi2d ConvertWorldPositionToPixels(const olc::vf2d& worldPosition) const;
     olc::vf2d ConvertPixelsToWorldPosition(const olc::vi2d& pixelsPosition) const;
+    float ConvertWorldLengthToPixels(float worldLength) const;
+    float ConvertPixelsToWorldLength(float pixelsLength) const;
 
     Scene& GetScene() { return _Scene; }
+    Camera& GetCamera() { return _Camera; }
 
     static AcademiaEngine* Instantiate();
     static AcademiaEngine* GetInstance();
@@ -32,4 +36,5 @@ private:
 
     GameManagerPtr _GameManager = nullptr;
     Scene _Scene;
+    Camera _Camera;
 };
