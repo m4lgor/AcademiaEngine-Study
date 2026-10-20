@@ -28,6 +28,11 @@ public:
     static AcademiaEngine* Instantiate();
     static AcademiaEngine* GetInstance();
 
+protected:
+
+    // Creates the game. Override to run something else instead (e.g. a visual test scenario).
+    virtual GameManagerPtr CreateGameManager();
+
 private:
 
     void PreUpdate(float elapsedTime);
