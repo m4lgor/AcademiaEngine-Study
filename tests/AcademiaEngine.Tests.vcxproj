@@ -101,6 +101,7 @@
     <ClCompile Include="..\src\Engine\TimeControl.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\DevTools.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\DevToolsStyle.cpp" />
+    <ClCompile Include="..\src\Engine\DevTools\FpsCounter.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\StatsPanel.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\PlayToolbar.cpp" />
     <ClCompile Include="..\src\Game\GameManager.cpp" />
@@ -116,6 +117,7 @@
     <ClInclude Include="..\src\Engine\TimeControl.h" />
     <ClInclude Include="..\src\Engine\DevTools\DevTools.h" />
     <ClInclude Include="..\src\Engine\DevTools\DevToolsStyle.h" />
+    <ClInclude Include="..\src\Engine\DevTools\FpsCounter.h" />
     <ClInclude Include="..\src\Engine\DevTools\StatsPanel.h" />
     <ClInclude Include="..\src\Engine\DevTools\PlayToolbar.h" />
     <ClInclude Include="..\src\Game\GameObject.h" />

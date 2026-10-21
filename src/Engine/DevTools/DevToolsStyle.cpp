@@ -4,6 +4,15 @@
 
 namespace DevToolsStyle
 {
+    olc::Pixel FpsColor(float fps)
+    {
+        if (fps >= GoodFps)
+            return GoodColor;
+        if (fps >= WarningFps)
+            return WarningColor;
+        return BadColor;
+    }
+
     int TextWidth(const std::string& text)
     {
         return static_cast<int>(text.size()) * CharSize;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FpsCounter.h"
 #include "StatsPanel.h"
 #include "PlayToolbar.h"
 
@@ -7,7 +8,7 @@ class AcademiaEngine;
 
 // In-game developer tools: the panels drawn on top of the game and the debug keys.
 // The tools only display and drive engine systems (TimeControl, Camera...), they hold no game state.
-//   F1  show / hide the dev tools
+//   F1  show / hide the dev tools (the FPS counter stays)
 //   F2  pause / resume the game
 //   F3  while paused, advance the game by one step
 class DevTools
@@ -25,8 +26,12 @@ public:
 
     bool Visible = true;
 
+    // The stats panel is opened with the toolbar's stats button
+    bool ShowStats = false;
+
 private:
 
+    FpsCounter _FpsCounter;
     StatsPanel _StatsPanel;
     PlayToolbar _PlayToolbar;
 };

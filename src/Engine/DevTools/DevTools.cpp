@@ -28,14 +28,18 @@ void DevTools::HandleInput(AcademiaEngine& engine)
 
 void DevTools::Update(float elapsedTime)
 {
-    _StatsPanel.Update(elapsedTime);
+    _FpsCounter.Update(elapsedTime);
 }
 
 void DevTools::Draw(AcademiaEngine& engine) const
 {
+    _FpsCounter.Draw(engine);
+
     if (!Visible)
         return;
 
-    _StatsPanel.Draw(engine);
+    if (ShowStats)
+        _StatsPanel.Draw(engine, _FpsCounter);
+
     _PlayToolbar.Draw(engine);
 }

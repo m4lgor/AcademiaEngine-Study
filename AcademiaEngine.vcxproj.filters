@@ -39,6 +39,9 @@
     <ClCompile Include="src\Engine\DevTools\DevToolsStyle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\DevTools\FpsCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\DevTools\StatsPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\DevTools\DevToolsStyle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\DevTools\FpsCounter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\DevTools\StatsPanel.h">

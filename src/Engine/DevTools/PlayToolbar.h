@@ -4,7 +4,7 @@
 
 class AcademiaEngine;
 
-// Pause and step buttons at the top center of the screen, like Unity's toolbar
+// Buttons at the top center of the screen, like Unity's toolbar: pause, step, and stats panel
 class PlayToolbar
 {
 public:
@@ -22,6 +22,7 @@ private:
         olc::vi2d Size;
         olc::vi2d PauseButton;
         olc::vi2d StepButton;
+        olc::vi2d StatsButton;
     };
 
     static Layout GetLayout(const AcademiaEngine& engine);

@@ -6,53 +6,30 @@
 
 #include "../AcademiaEngine.h"
 #include "DevToolsStyle.h"
+#include "FpsCounter.h"
 
 using namespace DevToolsStyle;
 
 namespace
 {
-    constexpr float AveragingWindow = 0.25f;
-
     constexpr int RowHeight = CharSize + 6;
     constexpr int SectionGap = 10;       // Space around the separator lines
     constexpr int ColumnGap = CharSize;  // Between the label and value columns
     constexpr int HintGap = 6;           // Between a key box and its action
-
-    olc::Pixel FpsColor(float fps)
-    {
-        if (fps >= 55.0f)
-            return GoodColor;
-        if (fps >= 30.0f)
-            return WarningColor;
-        return BadColor;
-    }
 }
 
-void StatsPanel::Update(float elapsedTime)
-{
-    _AccumulatedTime += elapsedTime;
-    ++_AccumulatedFrames;
-
-    if (_AccumulatedTime >= AveragingWindow)
-    {
-        _AverageFrameTime = _AccumulatedTime / static_cast<float>(_AccumulatedFrames);
-        _AccumulatedTime = 0.0f;
-        _AccumulatedFrames = 0;
-    }
-}
-
-void StatsPanel::Draw(AcademiaEngine& engine) const
+void StatsPanel::Draw(AcademiaEngine& engine, const FpsCounter& fpsCounter) const
 {
     const Camera& camera = engine.GetCamera();
     const olc::vf2d mouse = engine.ConvertPixelsToWorldPosition(engine.GetMousePos());
-    const float fps = _AverageFrameTime > 0.0f ? 1.0f / _AverageFrameTime : 0.0f;
+    const float fps = fpsCounter.GetFps();
     const bool paused = engine.GetTimeControl().IsPaused();
 
     // Label and value columns. A row can have a dimmed suffix after its value.
     struct Row { std::string Label; std::string Value; olc::Pixel ValueColor; std::string Suffix; };
     const std::vector<Row> rows =
     {
-        { "FPS", Format("%.0f", fps), FpsColor(fps), Format(" %.2f ms", _AverageFrameTime * 1000.0f) },
+        { "FPS", Format("%.0f", fps), FpsColor(fps), Format(" %.2f ms", fpsCounter.GetFrameTime() * 1000.0f) },
         { "Objects", std::to_string(engine.GetScene().GetObjectCount()), ValueColor, "" },
         { "Camera", Format("%.2f, %.2f", camera.Position.x, camera.Position.y), ValueColor, "" },
         { "Zoom", Format("x%.2f", camera.Zoom), ValueColor, "" },

@@ -33,6 +33,11 @@ namespace DevToolsStyle
     const olc::Pixel HoverColor(70, 82, 110);
     const olc::Pixel ActiveColor(60, 125, 210);
 
+    // Green at GoodFps and above, amber above WarningFps, red below
+    constexpr float GoodFps = 55.0f;
+    constexpr float WarningFps = 30.0f;
+    olc::Pixel FpsColor(float fps);
+
     template<typename... Args>
     std::string Format(const char* format, Args... args)
     {

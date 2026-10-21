@@ -9,6 +9,7 @@ namespace
 {
     constexpr int ButtonSize = 34;
     constexpr int ButtonGap = 4;
+    constexpr int GroupGap = 14;         // Between the time buttons and the stats button
     constexpr int ToolbarPadding = 4;
 
     bool IsInButton(const olc::vi2d& button, const olc::vi2d& point)
@@ -28,10 +29,11 @@ namespace
 PlayToolbar::Layout PlayToolbar::GetLayout(const AcademiaEngine& engine)
 {
     Layout layout;
-    layout.Size = { ButtonSize * 2 + ButtonGap + ToolbarPadding * 2, ButtonSize + ToolbarPadding * 2 };
+    layout.Size = { ButtonSize * 3 + ButtonGap + GroupGap + ToolbarPadding * 2, ButtonSize + ToolbarPadding * 2 };
     layout.Position = { (engine.ScreenWidth() - layout.Size.x) / 2, ScreenMargin };
     layout.PauseButton = layout.Position + olc::vi2d{ ToolbarPadding, ToolbarPadding };
     layout.StepButton = layout.PauseButton + olc::vi2d{ ButtonSize + ButtonGap, 0 };
+    layout.StatsButton = layout.StepButton + olc::vi2d{ ButtonSize + GroupGap, 0 };
     return layout;
 }
 
@@ -48,6 +50,8 @@ void PlayToolbar::HandleInput(AcademiaEngine& engine)
         timeControl.TogglePause();
     else if (IsInButton(layout.StepButton, mouse))
         timeControl.StepOneFrame();
+    else if (IsInButton(layout.StatsButton, mouse))
+        engine.GetDevTools().ShowStats = !engine.GetDevTools().ShowStats;
 }
 
 void PlayToolbar::Draw(AcademiaEngine& engine) const
@@ -76,5 +80,15 @@ void PlayToolbar::Draw(AcademiaEngine& engine) const
         const olc::Pixel iconColor = paused ? ValueColor : DisabledColor;
         engine.FillTriangle(center + olc::vi2d{ -7, -8 }, center + olc::vi2d{ -7, 8 }, center + olc::vi2d{ 3, 0 }, iconColor);
         engine.FillRect(center + olc::vi2d{ 4, -8 }, { 4, 17 }, iconColor);
+    }
+
+    // Stats: bar chart, highlighted while the stats panel is open
+    {
+        const olc::vi2d button = layout.StatsButton;
+        FillPanel(engine, button, { ButtonSize, ButtonSize }, ButtonColor(engine.GetDevTools().ShowStats, IsInButton(button, mouse)));
+        const olc::vi2d bottomLeft = button + olc::vi2d{ ButtonSize / 2 - 9, ButtonSize / 2 + 8 };
+        engine.FillRect(bottomLeft + olc::vi2d{ 0, -7 }, { 4, 7 }, ValueColor);
+        engine.FillRect(bottomLeft + olc::vi2d{ 7, -16 }, { 4, 16 }, ValueColor);
+        engine.FillRect(bottomLeft + olc::vi2d{ 14, -11 }, { 4, 11 }, ValueColor);
     }
 }
