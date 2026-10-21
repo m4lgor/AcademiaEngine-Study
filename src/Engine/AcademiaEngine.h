@@ -6,6 +6,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "TimeControl.h"
+#include "DevTools/DevTools.h"
 
 class GameManager;
 
@@ -26,6 +27,7 @@ public:
     Scene& GetScene() { return _Scene; }
     Camera& GetCamera() { return _Camera; }
     TimeControl& GetTimeControl() { return _TimeControl; }
+    DevTools& GetDevTools() { return _DevTools; }
 
     static AcademiaEngine* Instantiate();
     static AcademiaEngine* GetInstance();
@@ -45,4 +47,5 @@ private:
     Scene _Scene;
     Camera _Camera;
     TimeControl _TimeControl;
+    DevTools _DevTools;
 };

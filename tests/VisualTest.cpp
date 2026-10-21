@@ -79,9 +79,11 @@ void VisualTestEngine::DrawStepLabel()
     const std::string stepLabel = "Step " + std::to_string(_CurrentStep + 1) + "/" + std::to_string(_Steps.size())
         + ": " + _Steps[_CurrentStep].Name;
 
-    FillRect({ 0, 0 }, { ScreenWidth(), 44 }, olc::VERY_DARK_GREY);
-    DrawString({ 8, 6 }, _TestName, olc::WHITE, 2);
-    DrawString({ 8, 26 }, stepLabel, olc::YELLOW, 2);
+    // Bottom of the screen, the debug overlay uses the top
+    const int top = ScreenHeight() - 44;
+    FillRect({ 0, top }, { ScreenWidth(), 44 }, olc::VERY_DARK_GREY);
+    DrawString({ 8, top + 6 }, _TestName, olc::WHITE, 2);
+    DrawString({ 8, top + 26 }, stepLabel, olc::YELLOW, 2);
 }
 
 void RunVisualTest(const std::string& testName, std::vector<VisualStep> steps)

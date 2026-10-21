@@ -43,6 +43,9 @@ bool AcademiaEngine::OnUserDestroy()
 
 void AcademiaEngine::PreUpdate(float elapsedTime)
 {
+    _DevTools.HandleInput(*this);
+    _DevTools.Update(elapsedTime);
+
     Clear(olc::BLACK);
 }
 
@@ -65,6 +68,8 @@ void AcademiaEngine::Update(float elapsedTime)
 void AcademiaEngine::PostUpdate(float elapsedTime)
 {
     _Scene.FlushPending();
+
+    _DevTools.Draw(*this);
 }
 
 GameManagerPtr AcademiaEngine::CreateGameManager()
