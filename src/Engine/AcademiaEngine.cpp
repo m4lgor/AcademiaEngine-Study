@@ -48,10 +48,17 @@ void AcademiaEngine::PreUpdate(float elapsedTime)
 
 void AcademiaEngine::Update(float elapsedTime)
 {
-    if(_GameManager)
-        _GameManager->Update(elapsedTime);
+    // Paused: skip gameplay, unless a single step was requested
+    if (_TimeControl.Tick(elapsedTime))
+    {
+        const float gameplayTime = _TimeControl.GetElapsedTime();
 
-    _Scene.Update(elapsedTime);
+        if (_GameManager)
+            _GameManager->Update(gameplayTime);
+
+        _Scene.Update(gameplayTime);
+    }
+
     _Scene.Draw(*this);
 }
 

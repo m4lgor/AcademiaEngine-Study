@@ -48,6 +48,15 @@ namespace
         bool _HasSpawned = false;
     };
 
+    // Moves at a constant velocity
+    class MovingObject : public ExampleGameObject
+    {
+    public:
+        void Update(float elapsedTime) override { Position += Velocity * elapsedTime; }
+
+        olc::vf2d Velocity;
+    };
+
     std::shared_ptr<ExampleGameObject> SpawnCircle(VisualTestEngine& engine, const olc::vf2d& position, const olc::Pixel& color)
     {
         std::shared_ptr<ExampleGameObject> circle = engine.GetScene().Spawn<ExampleGameObject>();
@@ -233,6 +242,71 @@ TEST_SUITE("Visual")
                     checkCenterColor(engine, olc::RED);
                     // White circle at the origin: 2 units * 150 px to the left
                     CHECK(engine.GetDrawTarget()->GetPixel(212, 512) == olc::WHITE);
+                }
+            },
+        });
+    }
+
+    TEST_CASE("Visual - Pause and step")
+    {
+        std::shared_ptr<MovingObject> mover;
+        float startX = 0.0f;
+
+        RunVisualTest("Pause and step", {
+            {
+                "Running: the circle moves right at 1 unit/s",
+                [&](VisualTestEngine& engine)
+                {
+                    engine.GetScene().Spawn<GridObject>();
+                    mover = engine.GetScene().Spawn<MovingObject>();
+                    mover->Position = { -6.0f, 0.0f };
+                    mover->Velocity = { 1.0f, 0.0f };
+                    mover->Color = olc::CYAN;
+                    startX = mover->Position.x;
+                },
+                [&](VisualTestEngine& engine)
+                {
+                    CHECK(mover->Position.x > startX);
+                }
+            },
+            {
+                "Paused (F2): the circle stops but is still drawn",
+                [&](VisualTestEngine& engine)
+                {
+                    engine.GetTimeControl().SetPaused(true);
+                    startX = mover->Position.x;
+                },
+                [&](VisualTestEngine& engine)
+                {
+                    CHECK(engine.GetTimeControl().IsPaused());
+                    CHECK(mover->Position.x == startX);
+                    CheckColorAt(engine, mover->Position, olc::CYAN);
+                }
+            },
+            {
+                "Step (F3): the circle moves exactly one 1/60 s step",
+                [&](VisualTestEngine& engine)
+                {
+                    startX = mover->Position.x;
+                    engine.GetTimeControl().StepOneFrame();
+                },
+                [&](VisualTestEngine& engine)
+                {
+                    CHECK(engine.GetTimeControl().IsPaused());
+                    CHECK(mover->Position.x == doctest::Approx(startX + TimeControl::StepDeltaTime * mover->Velocity.x));
+                }
+            },
+            {
+                "Resumed (F2): the circle moves again",
+                [&](VisualTestEngine& engine)
+                {
+                    engine.GetTimeControl().SetPaused(false);
+                    startX = mover->Position.x;
+                },
+                [&](VisualTestEngine& engine)
+                {
+                    CHECK_FALSE(engine.GetTimeControl().IsPaused());
+                    CHECK(mover->Position.x > startX);
                 }
             },
         });

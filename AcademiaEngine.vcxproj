@@ -163,6 +163,7 @@
     <ClCompile Include="src\Engine\AcademiaEngine.cpp" />
     <ClCompile Include="src\Engine\Scene.cpp" />
     <ClCompile Include="src\Engine\Camera.cpp" />
+    <ClCompile Include="src\Engine\TimeControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\GameManager.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="src\Engine\AcademiaEngine.h" />
     <ClInclude Include="src\Engine\Scene.h" />
     <ClInclude Include="src\Engine\Camera.h" />
+    <ClInclude Include="src\Engine\TimeControl.h" />
     <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
