@@ -1,0 +1,37 @@
+# Files Perforce should never add or reconcile.
+# Set once per machine:  p4 set P4IGNORE=.p4ignore
+
+# Visual Studio build output
+x64/
+Debug/
+Release/
+/AcademiaEngine/
+Uqat_PGJ*/
+Academia.*/
+.vs/
+*.obj
+*.o
+*.pch
+*.ilk
+*.pdb
+*.idb
+*.lib
+*.dll
+*.exe
+*.exp
+*.log
+*.tlog
+*.ipch
+*.VC.db
+*.VC.opendb
+
+# Per-user IDE files
+*.user
+*.suo
+.idea/
+.vscode/
+
+# Not part of the depot
+.git/
+.gitignore
+.claude/
