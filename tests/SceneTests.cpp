@@ -4,18 +4,44 @@
 
 namespace
 {
+    // A Scene that removes what the test left in it, so the leak report stays quiet
+    class TestScene : public Scene
+    {
+    public:
+        ~TestScene()
+        {
+            Clear();
+            FlushPending();
+        }
+    };
+
     class TestObject : public GameObject
     {
     public:
         TestObject() = default;
-        explicit TestObject(const olc::vf2d& position) { Position = position; }
+        explicit TestObject(const Vector2f& position) { Position = position; }
 
         void Update(float elapsedTime) override { ++UpdateCount; }
+        void FixedUpdate(float fixedDeltaTime) override { ++FixedUpdateCount; LastFixedDeltaTime = fixedDeltaTime; }
 
         int UpdateCount = 0;
+        int FixedUpdateCount = 0;
+        float LastFixedDeltaTime = 0.0f;
     };
 
-    // Spawns a child the first time it is updated, like a gun firing a bullet
+    class OrderedObject : public GameObject
+    {
+    public:
+        OrderedObject(std::vector<int>& order, int id) : _Order(order), _Id(id) {}
+
+        void Update(float elapsedTime) override { _Order.push_back(_Id); }
+
+    private:
+        std::vector<int>& _Order;
+        int _Id;
+    };
+
+    // Adds a child the first time it is updated, like a gun firing a bullet
     class SpawnerObject : public GameObject
     {
     public:
@@ -23,85 +49,107 @@ namespace
 
         void Update(float elapsedTime) override
         {
-            if (!Child.lock())
-                Child = _Scene.Spawn<TestObject>();
+            if (!Child)
+                Child = _Scene.Add<TestObject>();
         }
 
-        std::weak_ptr<TestObject> Child;
+        TestObject* Child = nullptr;
 
     private:
         Scene& _Scene;
     };
 
-    // Destroys itself the first time it is updated
-    class SelfDestroyObject : public GameObject
+    // Removes another object the first time it is updated
+    class RemoverObject : public GameObject
     {
     public:
-        explicit SelfDestroyObject(Scene& scene) : _Scene(scene) {}
+        RemoverObject(Scene& scene, GameObject* target) : _Scene(scene), _Target(target) {}
 
         void Update(float elapsedTime) override
         {
-            ++UpdateCount;
-            for (const GameObjectPtr& object : _Scene.GetObjects())
-            {
-                if (object.get() == this)
-                    _Scene.Destroy(object);
-            }
+            _Scene.Remove(_Target);
         }
-
-        int UpdateCount = 0;
 
     private:
         Scene& _Scene;
+        GameObject* _Target;
     };
 }
 
-TEST_CASE("Scene - Spawn returns the object but only adds it at the end of the frame")
+TEST_CASE("Scene - Add returns the object but only adds it at the end of the frame")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<TestObject> object = scene.Spawn<TestObject>();
+    TestObject* object = scene.Add<TestObject>();
 
     REQUIRE(object != nullptr);
     CHECK(scene.GetObjectCount() == 0);
-    CHECK(IsValid(object));
 
     scene.FlushPending();
 
-    REQUIRE(scene.GetObjectCount() == 1);
-    CHECK(scene.GetObjects()[0] == object);
+    CHECK(scene.GetObjectCount() == 1);
+    CHECK(object->IsPendingRemove() == false);
 }
 
-TEST_CASE("Scene - Spawn forwards constructor arguments")
+TEST_CASE("Scene - Add forwards constructor arguments")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<TestObject> object = scene.Spawn<TestObject>(olc::vf2d{ 3.0f, -2.0f });
+    TestObject* object = scene.Add<TestObject>(Vector2f{ 3.0f, -2.0f });
 
     CHECK(object->Position.x == doctest::Approx(3.0f));
     CHECK(object->Position.y == doctest::Approx(-2.0f));
 }
 
-TEST_CASE("Scene - Spawned objects keep their spawn order")
+TEST_CASE("Scene - FixedUpdate reaches flushed objects with the given delta time")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<TestObject> first = scene.Spawn<TestObject>();
-    std::shared_ptr<TestObject> second = scene.Spawn<TestObject>();
-    std::shared_ptr<TestObject> third = scene.Spawn<TestObject>();
+    TestObject* object = scene.Add<TestObject>();
+    scene.FixedUpdate(0.5f);
+    CHECK(object->FixedUpdateCount == 0);
+
     scene.FlushPending();
+    scene.FixedUpdate(0.5f);
+    scene.FixedUpdate(0.5f);
 
-    REQUIRE(scene.GetObjectCount() == 3);
-    CHECK(scene.GetObjects()[0] == first);
-    CHECK(scene.GetObjects()[1] == second);
-    CHECK(scene.GetObjects()[2] == third);
+    CHECK(object->FixedUpdateCount == 2);
+    CHECK(object->LastFixedDeltaTime == doctest::Approx(0.5f));
+    CHECK(object->UpdateCount == 0);
+}
+
+TEST_CASE("Scene - FixedUpdate skips objects that were removed")
+{
+    TestScene scene;
+
+    TestObject* object = scene.Add<TestObject>();
+    scene.FlushPending();
+    scene.Remove(object);
+
+    scene.FixedUpdate(0.016f);
+
+    CHECK(object->FixedUpdateCount == 0);
+}
+
+TEST_CASE("Scene - Added objects keep their add order")
+{
+    TestScene scene;
+    std::vector<int> updateOrder;
+
+    scene.Add<OrderedObject>(updateOrder, 1);
+    scene.Add<OrderedObject>(updateOrder, 2);
+    scene.Add<OrderedObject>(updateOrder, 3);
+    scene.FlushPending();
+    scene.Update(0.016f);
+
+    CHECK((updateOrder == std::vector<int>{ 1, 2, 3 }));
 }
 
 TEST_CASE("Scene - Update only reaches objects that were flushed")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<TestObject> object = scene.Spawn<TestObject>();
+    TestObject* object = scene.Add<TestObject>();
     scene.Update(0.016f);
     CHECK(object->UpdateCount == 0);
 
@@ -110,37 +158,36 @@ TEST_CASE("Scene - Update only reaches objects that were flushed")
     CHECK(object->UpdateCount == 1);
 }
 
-TEST_CASE("Scene - Spawning from inside Update is safe and takes effect next frame")
+TEST_CASE("Scene - Adding from inside Update is safe and takes effect next frame")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<SpawnerObject> spawner = scene.Spawn<SpawnerObject>(scene);
+    SpawnerObject* spawner = scene.Add<SpawnerObject>(scene);
     scene.FlushPending();
 
     scene.Update(0.016f);
 
-    std::shared_ptr<TestObject> child = spawner->Child.lock();
-    REQUIRE(child != nullptr);
+    REQUIRE(spawner->Child != nullptr);
     CHECK(scene.GetObjectCount() == 1);
-    CHECK(child->UpdateCount == 0);
+    CHECK(spawner->Child->UpdateCount == 0);
 
     scene.FlushPending();
     CHECK(scene.GetObjectCount() == 2);
 
     scene.Update(0.016f);
-    CHECK(child->UpdateCount == 1);
+    CHECK(spawner->Child->UpdateCount == 1);
 }
 
-TEST_CASE("Scene - Destroy invalidates immediately and removes at the end of the frame")
+TEST_CASE("Scene - Remove marks immediately and deletes at the end of the frame")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<TestObject> object = scene.Spawn<TestObject>();
+    TestObject* object = scene.Add<TestObject>();
     scene.FlushPending();
 
-    scene.Destroy(object);
+    scene.Remove(object);
 
-    CHECK_FALSE(IsValid(object));
+    CHECK(object->IsPendingRemove());
     CHECK(scene.GetObjectCount() == 1);
 
     scene.Update(0.016f);
@@ -150,63 +197,95 @@ TEST_CASE("Scene - Destroy invalidates immediately and removes at the end of the
     CHECK(scene.GetObjectCount() == 0);
 }
 
-TEST_CASE("Scene - An object can destroy itself during its own Update")
+TEST_CASE("Scene - Removing from inside Update is safe, the target is still valid during the frame")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<SelfDestroyObject> object = scene.Spawn<SelfDestroyObject>(scene);
-    std::shared_ptr<TestObject> other = scene.Spawn<TestObject>();
+    TestObject* target = scene.Add<TestObject>();
+    scene.Add<RemoverObject>(scene, target);
+    TestObject* other = scene.Add<TestObject>();
     scene.FlushPending();
 
     scene.Update(0.016f);
-    scene.FlushPending();
 
-    CHECK(object->UpdateCount == 1);
-    REQUIRE(scene.GetObjectCount() == 1);
-    CHECK(scene.GetObjects()[0] == other);
+    // Same frame: the target was skipped but is not deleted yet
+    CHECK(target->IsPendingRemove());
+    CHECK(scene.GetObjectCount() == 3);
+
+    scene.FlushPending();
+    CHECK(scene.GetObjectCount() == 2);
+
+    scene.Update(0.016f);
+    CHECK(other->UpdateCount == 2);
 }
 
-TEST_CASE("Scene - Destroying an object before it was flushed never adds it")
+TEST_CASE("Scene - Removing an object before it was flushed never adds it")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::shared_ptr<TestObject> object = scene.Spawn<TestObject>();
-    scene.Destroy(object);
+    TestObject* object = scene.Add<TestObject>();
+    scene.Remove(object);
     scene.FlushPending();
 
     CHECK(scene.GetObjectCount() == 0);
 }
 
-TEST_CASE("Scene - The Scene owns its objects, weak references expire once removed")
+TEST_CASE("Scene - Remove ignores a null pointer")
 {
-    Scene scene;
+    TestScene scene;
 
-    std::weak_ptr<TestObject> reference = scene.Spawn<TestObject>();
-    scene.FlushPending();
-    REQUIRE(IsValid(reference));
-
-    scene.Destroy(reference.lock());
+    scene.Add<TestObject>();
     scene.FlushPending();
 
-    CHECK(reference.expired());
-    CHECK_FALSE(IsValid(reference));
+    scene.Remove(nullptr);
+    scene.FlushPending();
+
+    CHECK(scene.GetObjectCount() == 1);
 }
 
-TEST_CASE("Scene - Clear removes every object, including pending spawns")
+TEST_CASE("Scene - Clear removes every object, including pending additions")
 {
-    Scene scene;
+    TestScene scene;
 
-    scene.Spawn<TestObject>();
-    scene.Spawn<TestObject>();
+    scene.Add<TestObject>();
+    scene.Add<TestObject>();
     scene.FlushPending();
-    scene.Spawn<TestObject>();
+    scene.Add<TestObject>();
 
     scene.Clear();
     scene.FlushPending();
 
     CHECK(scene.GetObjectCount() == 0);
 
-    scene.Spawn<TestObject>();
+    scene.Add<TestObject>();
     scene.FlushPending();
     CHECK(scene.GetObjectCount() == 1);
+}
+
+// The next two tests print the leak report on purpose
+TEST_CASE("Scene - ReportLeaks counts the objects that were added but never removed")
+{
+    Scene scene;
+
+    TestObject* removed = scene.Add<TestObject>();
+    scene.Add<TestObject>();
+    scene.Add<TestObject>();
+    scene.FlushPending();
+    scene.Remove(removed);
+
+    CHECK(scene.ReportLeaks() == 2);
+    CHECK(scene.GetObjectCount() == 0);
+}
+
+TEST_CASE("Scene - ReportLeaks finds nothing when everything was removed")
+{
+    Scene scene;
+
+    TestObject* first = scene.Add<TestObject>();
+    TestObject* second = scene.Add<TestObject>();
+    scene.FlushPending();
+    scene.Remove(first);
+    scene.Remove(second);
+
+    CHECK(scene.ReportLeaks() == 0);
 }

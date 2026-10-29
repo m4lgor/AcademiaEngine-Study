@@ -12,11 +12,30 @@ namespace
     constexpr int MinFramesPerStep = 3;
 }
 
+namespace
+{
+    // The default GameBase updates the Scene and the steps do the rest
+    class EmptyGame : public GameBase
+    {
+    public:
+        void Initialize(AcademiaEngine* engineContext) override {}
+        void Uninitialize() override {}
+    };
+}
+
 VisualTestEngine::VisualTestEngine(const std::string& testName, std::vector<VisualStep> steps)
     : _TestName(testName)
     , _Steps(std::move(steps))
 {
     sAppName = "Visual test - " + testName;
+    SetGame(std::make_unique<EmptyGame>());
+}
+
+bool VisualTestEngine::OnUserDestroy()
+{
+    // The steps add objects without a game to remove them: clean up so the leak report stays quiet
+    GetScene().Clear();
+    return AcademiaEngine::OnUserDestroy();
 }
 
 bool VisualTestEngine::OnUserUpdate(float elapsedTime)
@@ -65,9 +84,9 @@ bool VisualTestEngine::OnUserUpdate(float elapsedTime)
     return true;
 }
 
-olc::Pixel VisualTestEngine::GetPixelAtWorld(const olc::vf2d& worldPosition)
+olc::Pixel VisualTestEngine::GetPixelAtWorld(const Vector2f& worldPosition)
 {
-    const olc::vi2d pixel = ConvertWorldPositionToPixels(worldPosition);
+    const Vector2i pixel = ConvertWorldPositionToPixels(worldPosition);
     return GetDrawTarget()->GetPixel(pixel.x, pixel.y);
 }
 

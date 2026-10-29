@@ -30,6 +30,11 @@ TEST_CASE("TimeControl - a step while paused runs exactly one fixed step")
     CHECK_FALSE(time.Tick(0.002f));
 }
 
+TEST_CASE("TimeControl - a step lasts as long as one fixed step")
+{
+    CHECK(TimeControl::StepDeltaTime == FixedTimestep::DeltaTime);
+}
+
 TEST_CASE("TimeControl - step is ignored while running")
 {
     TimeControl time;

@@ -12,7 +12,7 @@ namespace
     constexpr int GroupGap = 14;         // Between the time buttons and the stats button
     constexpr int ToolbarPadding = 4;
 
-    bool IsInButton(const olc::vi2d& button, const olc::vi2d& point)
+    bool IsInButton(const Vector2i& button, const Vector2i& point)
     {
         return point.x >= button.x && point.x < button.x + ButtonSize
             && point.y >= button.y && point.y < button.y + ButtonSize;
@@ -31,9 +31,9 @@ PlayToolbar::Layout PlayToolbar::GetLayout(const AcademiaEngine& engine)
     Layout layout;
     layout.Size = { ButtonSize * 3 + ButtonGap + GroupGap + ToolbarPadding * 2, ButtonSize + ToolbarPadding * 2 };
     layout.Position = { (engine.ScreenWidth() - layout.Size.x) / 2, ScreenMargin };
-    layout.PauseButton = layout.Position + olc::vi2d{ ToolbarPadding, ToolbarPadding };
-    layout.StepButton = layout.PauseButton + olc::vi2d{ ButtonSize + ButtonGap, 0 };
-    layout.StatsButton = layout.StepButton + olc::vi2d{ ButtonSize + GroupGap, 0 };
+    layout.PauseButton = layout.Position + Vector2i{ ToolbarPadding, ToolbarPadding };
+    layout.StepButton = layout.PauseButton + Vector2i{ ButtonSize + ButtonGap, 0 };
+    layout.StatsButton = layout.StepButton + Vector2i{ ButtonSize + GroupGap, 0 };
     return layout;
 }
 
@@ -43,7 +43,7 @@ void PlayToolbar::HandleInput(AcademiaEngine& engine)
         return;
 
     const Layout layout = GetLayout(engine);
-    const olc::vi2d mouse = engine.GetMousePos();
+    const Vector2i mouse = engine.GetMousePos();
     TimeControl& timeControl = engine.GetTimeControl();
 
     if (IsInButton(layout.PauseButton, mouse))
@@ -57,38 +57,38 @@ void PlayToolbar::HandleInput(AcademiaEngine& engine)
 void PlayToolbar::Draw(AcademiaEngine& engine) const
 {
     const Layout layout = GetLayout(engine);
-    const olc::vi2d mouse = engine.GetMousePos();
+    const Vector2i mouse = engine.GetMousePos();
     const bool paused = engine.GetTimeControl().IsPaused();
 
     DrawPanel(engine, layout.Position, layout.Size);
 
     // Pause: two bars, highlighted while the game is paused
     {
-        const olc::vi2d button = layout.PauseButton;
+        const Vector2i button = layout.PauseButton;
         FillPanel(engine, button, { ButtonSize, ButtonSize }, ButtonColor(paused, IsInButton(button, mouse)));
-        const olc::vi2d center = button + olc::vi2d{ ButtonSize / 2, ButtonSize / 2 };
-        engine.FillRect(center + olc::vi2d{ -7, -8 }, { 5, 16 }, ValueColor);
-        engine.FillRect(center + olc::vi2d{ 2, -8 }, { 5, 16 }, ValueColor);
+        const Vector2i center = button + Vector2i{ ButtonSize / 2, ButtonSize / 2 };
+        engine.FillRect(center + Vector2i{ -7, -8 }, { 5, 16 }, ValueColor);
+        engine.FillRect(center + Vector2i{ 2, -8 }, { 5, 16 }, ValueColor);
     }
 
     // Step: triangle and bar, only usable while paused
     {
-        const olc::vi2d button = layout.StepButton;
+        const Vector2i button = layout.StepButton;
         const bool hovered = paused && IsInButton(button, mouse);
         FillPanel(engine, button, { ButtonSize, ButtonSize }, ButtonColor(false, hovered));
-        const olc::vi2d center = button + olc::vi2d{ ButtonSize / 2, ButtonSize / 2 };
+        const Vector2i center = button + Vector2i{ ButtonSize / 2, ButtonSize / 2 };
         const olc::Pixel iconColor = paused ? ValueColor : DisabledColor;
-        engine.FillTriangle(center + olc::vi2d{ -7, -8 }, center + olc::vi2d{ -7, 8 }, center + olc::vi2d{ 3, 0 }, iconColor);
-        engine.FillRect(center + olc::vi2d{ 4, -8 }, { 4, 17 }, iconColor);
+        engine.FillTriangle(center + Vector2i{ -7, -8 }, center + Vector2i{ -7, 8 }, center + Vector2i{ 3, 0 }, iconColor);
+        engine.FillRect(center + Vector2i{ 4, -8 }, { 4, 17 }, iconColor);
     }
 
     // Stats: bar chart, highlighted while the stats panel is open
     {
-        const olc::vi2d button = layout.StatsButton;
+        const Vector2i button = layout.StatsButton;
         FillPanel(engine, button, { ButtonSize, ButtonSize }, ButtonColor(engine.GetDevTools().ShowStats, IsInButton(button, mouse)));
-        const olc::vi2d bottomLeft = button + olc::vi2d{ ButtonSize / 2 - 9, ButtonSize / 2 + 8 };
-        engine.FillRect(bottomLeft + olc::vi2d{ 0, -7 }, { 4, 7 }, ValueColor);
-        engine.FillRect(bottomLeft + olc::vi2d{ 7, -16 }, { 4, 16 }, ValueColor);
-        engine.FillRect(bottomLeft + olc::vi2d{ 14, -11 }, { 4, 11 }, ValueColor);
+        const Vector2i bottomLeft = button + Vector2i{ ButtonSize / 2 - 9, ButtonSize / 2 + 8 };
+        engine.FillRect(bottomLeft + Vector2i{ 0, -7 }, { 4, 7 }, ValueColor);
+        engine.FillRect(bottomLeft + Vector2i{ 7, -16 }, { 4, 16 }, ValueColor);
+        engine.FillRect(bottomLeft + Vector2i{ 14, -11 }, { 4, 11 }, ValueColor);
     }
 }

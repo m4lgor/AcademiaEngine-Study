@@ -4,8 +4,8 @@
 
 namespace
 {
-    const olc::vi2d ScreenSize = { 1024, 1024 };
-    const olc::vi2d ScreenCenter = { 512, 512 };
+    const Vector2i ScreenSize = { 1024, 1024 };
+    const Vector2i ScreenCenter = { 512, 512 };
 }
 
 TEST_CASE("Camera - Default camera puts the world origin at the screen center")
@@ -20,34 +20,34 @@ TEST_CASE("Camera - World Y points up, screen Y points down")
     Camera camera;
 
     // 1 unit = 50 pixels by default
-    CHECK(camera.WorldToScreen({ 1.0f, 0.0f }, ScreenSize) == olc::vi2d{ 562, 512 });
-    CHECK(camera.WorldToScreen({ 0.0f, 1.0f }, ScreenSize) == olc::vi2d{ 512, 462 });
+    CHECK(camera.WorldToScreen({ 1.0f, 0.0f }, ScreenSize) == Vector2i{ 562, 512 });
+    CHECK(camera.WorldToScreen({ 0.0f, 1.0f }, ScreenSize) == Vector2i{ 512, 462 });
 }
 
 TEST_CASE("Camera - Moving the camera to the sides shifts objects the other way on screen")
 {
     Camera camera;
-    const olc::vf2d objectPosition = { 0.0f, 0.0f };
+    const Vector2f objectPosition = { 0.0f, 0.0f };
 
     SUBCASE("Right")
     {
         camera.Position = { 2.0f, 0.0f };
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 412, 512 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 412, 512 });
     }
     SUBCASE("Left")
     {
         camera.Position = { -2.0f, 0.0f };
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 612, 512 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 612, 512 });
     }
     SUBCASE("Up")
     {
         camera.Position = { 0.0f, 2.0f };
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 512, 612 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 512, 612 });
     }
     SUBCASE("Down")
     {
         camera.Position = { 0.0f, -2.0f };
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 512, 412 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 512, 412 });
     }
 }
 
@@ -65,26 +65,26 @@ TEST_CASE("Camera - What the camera looks at is always at the screen center")
 TEST_CASE("Camera - Zoom scales distances around the camera position")
 {
     Camera camera;
-    const olc::vf2d objectPosition = { 1.0f, 1.0f };
+    const Vector2f objectPosition = { 1.0f, 1.0f };
 
     SUBCASE("Zoom in")
     {
         camera.Zoom = 2.0f;
         CHECK(camera.GetScale() == doctest::Approx(100.0f));
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 612, 412 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 612, 412 });
     }
     SUBCASE("Zoom out")
     {
         camera.Zoom = 0.5f;
         CHECK(camera.GetScale() == doctest::Approx(25.0f));
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 537, 487 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 537, 487 });
     }
     SUBCASE("Zoom around a moved camera")
     {
         camera.Position = { 1.0f, 0.0f };
         camera.Zoom = 2.0f;
         // Object is 1 unit above the camera: 100 pixels above the center
-        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == olc::vi2d{ 512, 412 });
+        CHECK(camera.WorldToScreen(objectPosition, ScreenSize) == Vector2i{ 512, 412 });
     }
 }
 
@@ -106,8 +106,8 @@ TEST_CASE("Camera - ScreenToWorld is the inverse of WorldToScreen")
     camera.Position = { -3.5f, 2.25f };
     camera.Zoom = 1.5f;
 
-    const olc::vi2d pixel = { 300, 700 };
-    const olc::vf2d world = camera.ScreenToWorld(pixel, ScreenSize);
+    const Vector2i pixel = { 300, 700 };
+    const Vector2f world = camera.ScreenToWorld(pixel, ScreenSize);
 
     CHECK(camera.WorldToScreen(world, ScreenSize) == pixel);
 }

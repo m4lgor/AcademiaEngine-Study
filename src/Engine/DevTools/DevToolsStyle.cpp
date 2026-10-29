@@ -18,14 +18,14 @@ namespace DevToolsStyle
         return static_cast<int>(text.size()) * CharSize;
     }
 
-    void FillPanel(AcademiaEngine& engine, const olc::vi2d& position, const olc::vi2d& size, const olc::Pixel& color)
+    void FillPanel(AcademiaEngine& engine, const Vector2i& position, const Vector2i& size, const olc::Pixel& color)
     {
         engine.FillRect({ position.x + Corner, position.y }, { size.x - Corner * 2, size.y }, color);
         engine.FillRect({ position.x, position.y + Corner }, { Corner, size.y - Corner * 2 }, color);
         engine.FillRect({ position.x + size.x - Corner, position.y + Corner }, { Corner, size.y - Corner * 2 }, color);
     }
 
-    void DrawPanelBorder(AcademiaEngine& engine, const olc::vi2d& position, const olc::vi2d& size, const olc::Pixel& color)
+    void DrawPanelBorder(AcademiaEngine& engine, const Vector2i& position, const Vector2i& size, const olc::Pixel& color)
     {
         const int left = position.x;
         const int top = position.y;
@@ -42,7 +42,7 @@ namespace DevToolsStyle
         engine.DrawLine({ right - Corner, bottom }, { right, bottom - Corner }, color);
     }
 
-    void DrawPanel(AcademiaEngine& engine, const olc::vi2d& position, const olc::vi2d& size)
+    void DrawPanel(AcademiaEngine& engine, const Vector2i& position, const Vector2i& size)
     {
         engine.SetPixelMode(olc::Pixel::ALPHA);
         FillPanel(engine, position, size, PanelColor);
@@ -50,9 +50,9 @@ namespace DevToolsStyle
         DrawPanelBorder(engine, position, size, BorderColor);
     }
 
-    int DrawChip(AcademiaEngine& engine, const olc::vi2d& position, const std::string& text, const olc::Pixel& background, const olc::Pixel& textColor)
+    int DrawChip(AcademiaEngine& engine, const Vector2i& position, const std::string& text, const olc::Pixel& background, const olc::Pixel& textColor)
     {
-        const olc::vi2d size = { TextWidth(text) + ChipPadding * 2, ChipHeight };
+        const Vector2i size = { TextWidth(text) + ChipPadding * 2, ChipHeight };
         FillPanel(engine, position, size, background);
         engine.DrawString({ position.x + ChipPadding, position.y + ChipPadding }, text, textColor, TextScale);
         return size.x;

@@ -33,6 +33,9 @@
     <ClCompile Include="src\Engine\TimeControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\FixedTimestep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\DevTools\DevTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,6 +65,12 @@
     <ClInclude Include="src\Engine\AcademiaEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\GameBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -69,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\TimeControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FixedTimestep.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\DevTools\DevTools.h">
@@ -86,13 +98,10 @@
     <ClInclude Include="src\Engine\DevTools\PlayToolbar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Game\GameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Game\GameObject.h">
+    <ClInclude Include="src\Engine\GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\ExampleGameObject.h">

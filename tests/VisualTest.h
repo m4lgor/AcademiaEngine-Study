@@ -16,7 +16,7 @@ struct VisualStep
     std::function<void(VisualTestEngine&)> Check;
 };
 
-// Runs the real AcademiaEngine window with a scripted list of steps instead of the GameManager.
+// Runs the real AcademiaEngine window with a scripted list of steps. The game does nothing: only the steps change the Scene.
 // The window closes by itself once every step is done.
 class VisualTestEngine : public AcademiaEngine
 {
@@ -24,17 +24,15 @@ public:
     VisualTestEngine(const std::string& testName, std::vector<VisualStep> steps);
 
     bool OnUserUpdate(float elapsedTime) override;
+    bool OnUserDestroy() override;
 
     // Color currently drawn at a world position
-    olc::Pixel GetPixelAtWorld(const olc::vf2d& worldPosition);
+    olc::Pixel GetPixelAtWorld(const Vector2f& worldPosition);
 
     size_t GetCompletedStepCount() const { return _CompletedSteps; }
 
     // How long each step stays on screen. 0 = as fast as possible. Set with --visual-hold=<seconds>.
     static float HoldSeconds;
-
-protected:
-    GameManagerPtr CreateGameManager() override { return nullptr; }
 
 private:
     void DrawStepLabel();

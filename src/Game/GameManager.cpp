@@ -1,19 +1,17 @@
 #include "GameManager.h"
 #include "../../external/olc/olcPixelGameEngine.h"
 #include "../Engine/AcademiaEngine.h"
+#include "ExampleGameObject.h"
 
 void GameManager::Initialize(AcademiaEngine* engineContext)
 {
     _EngineContext = engineContext;
 
-#ifdef ACADEMIA_EXAMPLE
-    std::shared_ptr<ExampleGameObject> exampleObject = _EngineContext->GetScene().Spawn<ExampleGameObject>();
-    exampleObject->Position = { 0.0f, 0.0f };
-    _ExampleObject = exampleObject;
-#endif
+    _ExampleObject = _EngineContext->GetScene().Add<ExampleGameObject>();
+    _ExampleObject->Position = { 0.0f, 0.0f };
 }
 
-void GameManager::Update(float elapsedTime)
+void GameManager::Update(Scene& scene, float elapsedTime)
 {
     constexpr olc::Key rightKey = olc::Key::D;
     constexpr olc::Key leftKey = olc::Key::A;
@@ -27,12 +25,24 @@ void GameManager::Update(float elapsedTime)
     const olc::HWButton jumpButton = _EngineContext->GetKey(spaceKey);
     
     // Gameplay code
-    // GameObjects spawned in the Scene are updated and drawn by the engine.
+
+    // Updates every GameObject of the Scene. Without this call, no object updates.
+    // Our code above runs first, then the objects.
+    GameBase::Update(scene, elapsedTime);
+}
+
+void GameManager::FixedUpdate(Scene& scene, float fixedDeltaTime)
+{
+    // Runs before the physics step, with the same fixedDeltaTime every time.
+    // Apply forces and velocities here. Read input in Update, not here: a key press
+    // lasts one frame, and a frame can run zero or several fixed steps.
+
+    // Calls FixedUpdate on every GameObject of the Scene
+    GameBase::FixedUpdate(scene, fixedDeltaTime);
 }
 
 void GameManager::Uninitialize()
 {
-#ifdef ACADEMIA_EXAMPLE
-    _ExampleObject.reset();
-#endif
+    _EngineContext->GetScene().Remove(_ExampleObject);
+    _ExampleObject = nullptr;
 }

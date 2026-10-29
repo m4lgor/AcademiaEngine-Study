@@ -35,14 +35,12 @@ namespace
                 return;
 
             _HasSpawned = true;
-            std::shared_ptr<ExampleGameObject> child = OwnerScene->Spawn<ExampleGameObject>();
-            child->Position = Position + olc::vf2d{ 1.5f, 0.0f };
+            ExampleGameObject* child = OwnerScene->Add<ExampleGameObject>();
+            child->Position = Position + Vector2f{ 1.5f, 0.0f };
             child->Color = olc::GREEN;
-            Child = child;
         }
 
         Scene* OwnerScene = nullptr;
-        std::weak_ptr<ExampleGameObject> Child;
 
     private:
         bool _HasSpawned = false;
@@ -54,18 +52,18 @@ namespace
     public:
         void Update(float elapsedTime) override { Position += Velocity * elapsedTime; }
 
-        olc::vf2d Velocity;
+        Vector2f Velocity;
     };
 
-    std::shared_ptr<ExampleGameObject> SpawnCircle(VisualTestEngine& engine, const olc::vf2d& position, const olc::Pixel& color)
+    ExampleGameObject* AddCircle(VisualTestEngine& engine, const Vector2f& position, const olc::Pixel& color)
     {
-        std::shared_ptr<ExampleGameObject> circle = engine.GetScene().Spawn<ExampleGameObject>();
+        ExampleGameObject* circle = engine.GetScene().Add<ExampleGameObject>();
         circle->Position = position;
         circle->Color = color;
         return circle;
     }
 
-    void CheckColorAt(VisualTestEngine& engine, const olc::vf2d& worldPosition, const olc::Pixel& expected)
+    void CheckColorAt(VisualTestEngine& engine, const Vector2f& worldPosition, const olc::Pixel& expected)
     {
         const olc::Pixel actual = engine.GetPixelAtWorld(worldPosition);
         INFO("at world (", worldPosition.x, ", ", worldPosition.y, ")");
@@ -78,9 +76,8 @@ TEST_SUITE("Visual")
     TEST_CASE("Visual - Spawn and destroy game objects")
     {
         // 5x5 grid, 2 units apart
-        auto gridPosition = [](int column, int row) { return olc::vf2d{ (column - 2) * 2.0f, (row - 2) * 2.0f }; };
-        std::vector<std::weak_ptr<ExampleGameObject>> circles;
-        std::weak_ptr<SpawnerObject> spawner;
+        auto gridPosition = [](int column, int row) { return Vector2f{ (column - 2) * 2.0f, (row - 2) * 2.0f }; };
+        std::vector<ExampleGameObject*> circles;
 
         RunVisualTest("Spawn and destroy game objects", {
             {
@@ -89,7 +86,7 @@ TEST_SUITE("Visual")
                 {
                     for (int row = 0; row < 5; ++row)
                         for (int column = 0; column < 5; ++column)
-                            circles.push_back(SpawnCircle(engine, gridPosition(column, row), olc::WHITE));
+                            circles.push_back(AddCircle(engine, gridPosition(column, row), olc::WHITE));
                 },
                 [&](VisualTestEngine& engine)
                 {
@@ -106,7 +103,7 @@ TEST_SUITE("Visual")
                     for (int row = 0; row < 5; ++row)
                         for (int column = 0; column < 5; ++column)
                             if ((row + column) % 2 == 1)
-                                engine.GetScene().Destroy(circles[row * 5 + column].lock());
+                                engine.GetScene().Remove(circles[row * 5 + column]);
                 },
                 [&](VisualTestEngine& engine)
                 {
@@ -115,7 +112,6 @@ TEST_SUITE("Visual")
                         for (int column = 0; column < 5; ++column)
                         {
                             const bool destroyed = (row + column) % 2 == 1;
-                            CHECK(IsValid(circles[row * 5 + column]) == !destroyed);
                             CheckColorAt(engine, gridPosition(column, row), destroyed ? olc::BLACK : olc::WHITE);
                         }
                 }
@@ -124,11 +120,10 @@ TEST_SUITE("Visual")
                 "Red spawner spawns a green circle from its Update",
                 [&](VisualTestEngine& engine)
                 {
-                    std::shared_ptr<SpawnerObject> object = engine.GetScene().Spawn<SpawnerObject>();
+                    SpawnerObject* object = engine.GetScene().Add<SpawnerObject>();
                     object->OwnerScene = &engine.GetScene();
                     object->Position = { -2.0f, -7.0f };
                     object->Color = olc::RED;
-                    spawner = object;
                 },
                 [&](VisualTestEngine& engine)
                 {
@@ -146,7 +141,6 @@ TEST_SUITE("Visual")
                 [&](VisualTestEngine& engine)
                 {
                     CHECK(engine.GetScene().GetObjectCount() == 0);
-                    CHECK_FALSE(IsValid(spawner));
                     CheckColorAt(engine, gridPosition(2, 2), olc::BLACK);
                     CheckColorAt(engine, { -2.0f, -7.0f }, olc::BLACK);
                 }
@@ -157,12 +151,12 @@ TEST_SUITE("Visual")
     TEST_CASE("Visual - Camera pan and zoom")
     {
         // Reference scene: grid, white circle at the origin, one colored circle 2 units away on each side
-        const olc::vf2d right = { 2.0f, 0.0f };
-        const olc::vf2d left = { -2.0f, 0.0f };
-        const olc::vf2d up = { 0.0f, 2.0f };
-        const olc::vf2d down = { 0.0f, -2.0f };
+        const Vector2f right = { 2.0f, 0.0f };
+        const Vector2f left = { -2.0f, 0.0f };
+        const Vector2f up = { 0.0f, 2.0f };
+        const Vector2f down = { 0.0f, -2.0f };
 
-        auto setCamera = [](VisualTestEngine& engine, const olc::vf2d& position, float zoom)
+        auto setCamera = [](VisualTestEngine& engine, const Vector2f& position, float zoom)
         {
             engine.GetCamera().Position = position;
             engine.GetCamera().Zoom = zoom;
@@ -178,12 +172,12 @@ TEST_SUITE("Visual")
                 "Reference: camera at the origin, zoom 1",
                 [&](VisualTestEngine& engine)
                 {
-                    engine.GetScene().Spawn<GridObject>();
-                    SpawnCircle(engine, { 0.0f, 0.0f }, olc::WHITE);
-                    SpawnCircle(engine, right, olc::RED);
-                    SpawnCircle(engine, left, olc::BLUE);
-                    SpawnCircle(engine, up, olc::GREEN);
-                    SpawnCircle(engine, down, olc::YELLOW);
+                    engine.GetScene().Add<GridObject>();
+                    AddCircle(engine, { 0.0f, 0.0f }, olc::WHITE);
+                    AddCircle(engine, right, olc::RED);
+                    AddCircle(engine, left, olc::BLUE);
+                    AddCircle(engine, up, olc::GREEN);
+                    AddCircle(engine, down, olc::YELLOW);
                 },
                 [&](VisualTestEngine& engine)
                 {
@@ -249,7 +243,7 @@ TEST_SUITE("Visual")
 
     TEST_CASE("Visual - Pause and step")
     {
-        std::shared_ptr<MovingObject> mover;
+        MovingObject* mover = nullptr;
         float startX = 0.0f;
 
         RunVisualTest("Pause and step", {
@@ -257,8 +251,8 @@ TEST_SUITE("Visual")
                 "Running: the circle moves right at 1 unit/s",
                 [&](VisualTestEngine& engine)
                 {
-                    engine.GetScene().Spawn<GridObject>();
-                    mover = engine.GetScene().Spawn<MovingObject>();
+                    engine.GetScene().Add<GridObject>();
+                    mover = engine.GetScene().Add<MovingObject>();
                     mover->Position = { -6.0f, 0.0f };
                     mover->Velocity = { 1.0f, 0.0f };
                     mover->Color = olc::CYAN;

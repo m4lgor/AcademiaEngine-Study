@@ -93,12 +93,15 @@
     <ClCompile Include="SceneTests.cpp" />
     <ClCompile Include="CameraTests.cpp" />
     <ClCompile Include="TimeControlTests.cpp" />
+    <ClCompile Include="FixedTimestepTests.cpp" />
+    <ClCompile Include="GameBaseTests.cpp" />
     <ClCompile Include="VisualTest.cpp" />
     <ClCompile Include="VisualTests.cpp" />
     <ClCompile Include="..\src\Engine\AcademiaEngine.cpp" />
     <ClCompile Include="..\src\Engine\Scene.cpp" />
     <ClCompile Include="..\src\Engine\Camera.cpp" />
     <ClCompile Include="..\src\Engine\TimeControl.cpp" />
+    <ClCompile Include="..\src\Engine\FixedTimestep.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\DevTools.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\DevToolsStyle.cpp" />
     <ClCompile Include="..\src\Engine\DevTools\FpsCounter.cpp" />
@@ -113,14 +116,17 @@
     <ClInclude Include="..\external\doctest\doctest.h" />
     <ClInclude Include="..\src\Engine\AcademiaEngine.h" />
     <ClInclude Include="..\src\Engine\Scene.h" />
+    <ClInclude Include="..\src\Engine\GameBase.h" />
+    <ClInclude Include="..\src\Math\Vector.h" />
     <ClInclude Include="..\src\Engine\Camera.h" />
     <ClInclude Include="..\src\Engine\TimeControl.h" />
+    <ClInclude Include="..\src\Engine\FixedTimestep.h" />
     <ClInclude Include="..\src\Engine\DevTools\DevTools.h" />
     <ClInclude Include="..\src\Engine\DevTools\DevToolsStyle.h" />
     <ClInclude Include="..\src\Engine\DevTools\FpsCounter.h" />
     <ClInclude Include="..\src\Engine\DevTools\StatsPanel.h" />
     <ClInclude Include="..\src\Engine\DevTools\PlayToolbar.h" />
-    <ClInclude Include="..\src\Game\GameObject.h" />
+    <ClInclude Include="..\src\Engine\GameObject.h" />
     <ClInclude Include="..\src\Game\ExampleGameObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

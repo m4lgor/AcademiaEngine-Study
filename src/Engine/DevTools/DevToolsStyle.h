@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../../../external/olc/olcPixelGameEngine.h"
+#include "../../Math/Vector.h"
 
 class AcademiaEngine;
 
@@ -49,12 +50,12 @@ namespace DevToolsStyle
     int TextWidth(const std::string& text);
 
     // Rectangle with cut corners
-    void FillPanel(AcademiaEngine& engine, const olc::vi2d& position, const olc::vi2d& size, const olc::Pixel& color);
-    void DrawPanelBorder(AcademiaEngine& engine, const olc::vi2d& position, const olc::vi2d& size, const olc::Pixel& color);
+    void FillPanel(AcademiaEngine& engine, const Vector2i& position, const Vector2i& size, const olc::Pixel& color);
+    void DrawPanelBorder(AcademiaEngine& engine, const Vector2i& position, const Vector2i& size, const olc::Pixel& color);
 
     // Semi-transparent panel with a border, so the scene stays visible behind it
-    void DrawPanel(AcademiaEngine& engine, const olc::vi2d& position, const olc::vi2d& size);
+    void DrawPanel(AcademiaEngine& engine, const Vector2i& position, const Vector2i& size);
 
     // Small filled box with text inside, used for badges and key hints. Returns its width.
-    int DrawChip(AcademiaEngine& engine, const olc::vi2d& position, const std::string& text, const olc::Pixel& background, const olc::Pixel& textColor);
+    int DrawChip(AcademiaEngine& engine, const Vector2i& position, const std::string& text, const olc::Pixel& background, const olc::Pixel& textColor);
 }

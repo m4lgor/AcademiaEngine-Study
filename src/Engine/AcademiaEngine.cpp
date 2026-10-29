@@ -1,7 +1,5 @@
 ﻿#include "AcademiaEngine.h"
 
-#include "../Game/GameManager.h"
-
 static AcademiaEngine* _Instance = nullptr;
 
 AcademiaEngine::AcademiaEngine()
@@ -11,9 +9,8 @@ AcademiaEngine::AcademiaEngine()
 
 bool AcademiaEngine::OnUserCreate()
 {
-    _GameManager = CreateGameManager();
-    if (_GameManager)
-        _GameManager->Initialize(this);
+    if (_Game)
+        _Game->Initialize(this);
 
     // Objects spawned during Initialize are live on the first frame
     _Scene.FlushPending();
@@ -25,6 +22,7 @@ bool AcademiaEngine::OnUserUpdate(float elapsedTime)
 {
     PreUpdate(elapsedTime);
     Update(elapsedTime);
+    DrawScene();
     PostUpdate(elapsedTime);
 
     return true;
@@ -32,11 +30,11 @@ bool AcademiaEngine::OnUserUpdate(float elapsedTime)
 
 bool AcademiaEngine::OnUserDestroy()
 {
-    if (_GameManager)
-        _GameManager->Uninitialize();
+    if (_Game)
+        _Game->Uninitialize();
 
-    _Scene.Clear();
-    _Scene.FlushPending();
+    // The game must have removed everything it added by now
+    _Scene.ReportLeaks();
 
     return true;
 }
@@ -52,16 +50,31 @@ void AcademiaEngine::PreUpdate(float elapsedTime)
 void AcademiaEngine::Update(float elapsedTime)
 {
     // Paused: skip gameplay, unless a single step was requested
-    if (_TimeControl.Tick(elapsedTime))
-    {
-        const float gameplayTime = _TimeControl.GetElapsedTime();
+    if (!_TimeControl.Tick(elapsedTime))
+        return;
 
-        if (_GameManager)
-            _GameManager->Update(gameplayTime);
+    const float gameplayTime = _TimeControl.GetElapsedTime();
 
-        _Scene.Update(gameplayTime);
-    }
+    // Once per frame. The game updates the Scene (GameBase::Update does it by default).
+    if (_Game)
+        _Game->Update(_Scene, gameplayTime);
 
+    // Zero, one or several fixed steps, all of the same duration
+    const int stepCount = _FixedTimestep.Advance(gameplayTime);
+    for (int step = 0; step < stepCount; ++step)
+        FixedUpdate(FixedTimestep::DeltaTime);
+}
+
+void AcademiaEngine::FixedUpdate(float fixedDeltaTime)
+{
+    // Gameplay goes first, so what it sets (forces, velocities) is used by the physics step that follows
+    if (_Game)
+        _Game->FixedUpdate(_Scene, fixedDeltaTime);
+}
+
+void AcademiaEngine::DrawScene()
+{
+    // After the simulation, so we draw what happened this frame. Also runs while paused.
     _Scene.Draw(*this);
 }
 
@@ -72,17 +85,12 @@ void AcademiaEngine::PostUpdate(float elapsedTime)
     _DevTools.Draw(*this);
 }
 
-GameManagerPtr AcademiaEngine::CreateGameManager()
-{
-    return std::make_shared<GameManager>();
-}
-
-olc::vi2d AcademiaEngine::ConvertWorldPositionToPixels(const olc::vf2d& worldPosition) const
+Vector2i AcademiaEngine::ConvertWorldPositionToPixels(const Vector2f& worldPosition) const
 {
     return _Camera.WorldToScreen(worldPosition, GetScreenSize());
 }
 
-olc::vf2d AcademiaEngine::ConvertPixelsToWorldPosition(const olc::vi2d& pixelsPosition) const
+Vector2f AcademiaEngine::ConvertPixelsToWorldPosition(const Vector2i& pixelsPosition) const
 {
     return _Camera.ScreenToWorld(pixelsPosition, GetScreenSize());
 }

@@ -21,7 +21,7 @@ namespace
 void StatsPanel::Draw(AcademiaEngine& engine, const FpsCounter& fpsCounter) const
 {
     const Camera& camera = engine.GetCamera();
-    const olc::vf2d mouse = engine.ConvertPixelsToWorldPosition(engine.GetMousePos());
+    const Vector2f mouse = engine.ConvertPixelsToWorldPosition(engine.GetMousePos());
     const float fps = fpsCounter.GetFps();
     const bool paused = engine.GetTimeControl().IsPaused();
 
@@ -68,8 +68,8 @@ void StatsPanel::Draw(AcademiaEngine& engine, const FpsCounter& fpsCounter) cons
     const int rowsHeight = static_cast<int>(rows.size()) * RowHeight - (RowHeight - CharSize);
     const int contentHeight = ChipHeight + SectionGap * 2 + rowsHeight + SectionGap * 2 + ChipHeight;
 
-    const olc::vi2d panelPosition = { ScreenMargin, ScreenMargin };
-    const olc::vi2d panelSize = { contentWidth + Padding * 2, contentHeight + Padding * 2 };
+    const Vector2i panelPosition = { ScreenMargin, ScreenMargin };
+    const Vector2i panelSize = { contentWidth + Padding * 2, contentHeight + Padding * 2 };
     DrawPanel(engine, panelPosition, panelSize);
 
     const int left = panelPosition.x + Padding;

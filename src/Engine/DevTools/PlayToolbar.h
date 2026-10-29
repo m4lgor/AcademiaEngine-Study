@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../external/olc/olcPixelGameEngine.h"
+#include "../../Math/Vector.h"
 
 class AcademiaEngine;
 
@@ -18,11 +19,11 @@ private:
 
     struct Layout
     {
-        olc::vi2d Position;
-        olc::vi2d Size;
-        olc::vi2d PauseButton;
-        olc::vi2d StepButton;
-        olc::vi2d StatsButton;
+        Vector2i Position;
+        Vector2i Size;
+        Vector2i PauseButton;
+        Vector2i StepButton;
+        Vector2i StatsButton;
     };
 
     static Layout GetLayout(const AcademiaEngine& engine);

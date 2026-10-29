@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-olc::vi2d Camera::WorldToScreen(const olc::vf2d& worldPosition, const olc::vi2d& screenSize) const
+Vector2i Camera::WorldToScreen(const Vector2f& worldPosition, const Vector2i& screenSize) const
 {
     const float scale = GetScale();
     const float pixelx = (worldPosition.x - Position.x) * scale + static_cast<float>(screenSize.x) * 0.5f;
@@ -13,7 +13,7 @@ olc::vi2d Camera::WorldToScreen(const olc::vf2d& worldPosition, const olc::vi2d&
     return { static_cast<int>(std::lround(pixelx)), static_cast<int>(std::lround(pixely)) };
 }
 
-olc::vf2d Camera::ScreenToWorld(const olc::vi2d& screenPosition, const olc::vi2d& screenSize) const
+Vector2f Camera::ScreenToWorld(const Vector2i& screenPosition, const Vector2i& screenSize) const
 {
     const float scale = GetScale();
     const float positionx = (static_cast<float>(screenPosition.x) - static_cast<float>(screenSize.x) * 0.5f) / scale + Position.x;

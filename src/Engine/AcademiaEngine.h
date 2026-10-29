@@ -1,14 +1,16 @@
 ﻿// ReSharper disable All
 #pragma once
 
+#include <utility>
+
 #include "../../external/olc/olcPixelGameEngine.h"
-#include "../Utils.h"
+#include "GameBase.h"
 #include "Scene.h"
 #include "Camera.h"
 #include "TimeControl.h"
+#include "FixedTimestep.h"
 #include "DevTools/DevTools.h"
-
-class GameManager;
+#include "../Math/Vector.h"
 
 class AcademiaEngine : public olc::PixelGameEngine
 {
@@ -19,33 +21,35 @@ public:
     bool OnUserUpdate(float elapsedTime) override;
     bool OnUserDestroy() override;
 
-    olc::vi2d ConvertWorldPositionToPixels(const olc::vf2d& worldPosition) const;
-    olc::vf2d ConvertPixelsToWorldPosition(const olc::vi2d& pixelsPosition) const;
+    Vector2i ConvertWorldPositionToPixels(const Vector2f& worldPosition) const;
+    Vector2f ConvertPixelsToWorldPosition(const Vector2i& pixelsPosition) const;
     float ConvertWorldLengthToPixels(float worldLength) const;
     float ConvertPixelsToWorldLength(float pixelsLength) const;
 
     Scene& GetScene() { return _Scene; }
     Camera& GetCamera() { return _Camera; }
     TimeControl& GetTimeControl() { return _TimeControl; }
+    const FixedTimestep& GetFixedTimestep() const { return _FixedTimestep; }
     DevTools& GetDevTools() { return _DevTools; }
+
+    // The game to run. Set it before Start(): the engine only knows the GameBase class.
+    void SetGame(GamePtr game) { _Game = std::move(game); }
 
     static AcademiaEngine* Instantiate();
     static AcademiaEngine* GetInstance();
-
-protected:
-
-    // Creates the game. Override to run something else instead (e.g. a visual test scenario).
-    virtual GameManagerPtr CreateGameManager();
 
 private:
 
     void PreUpdate(float elapsedTime);
     void Update(float elapsedTime);
+    void FixedUpdate(float fixedDeltaTime);
+    void DrawScene();
     void PostUpdate(float elapsedTime);
 
-    GameManagerPtr _GameManager = nullptr;
+    GamePtr _Game = nullptr;
     Scene _Scene;
     Camera _Camera;
     TimeControl _TimeControl;
+    FixedTimestep _FixedTimestep;
     DevTools _DevTools;
 };

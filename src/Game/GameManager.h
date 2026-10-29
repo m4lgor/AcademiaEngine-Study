@@ -1,32 +1,23 @@
 #pragma once
-#include <Utils.h>
+#include "../Engine/GameBase.h"
 
-#define ACADEMIA_EXAMPLE
+class ExampleGameObject;
 
-#ifdef ACADEMIA_EXAMPLE
-#include "ExampleGameObject.h"
-#endif
-
-class AcademiaEngine;
-
-class GameManager
+class GameManager : public GameBase
 {
 
 public:
 
-    void Initialize(AcademiaEngine* engineContext);
-    void Update(float elapsedTime);
-    void Uninitialize();
+    void Initialize(AcademiaEngine* engineContext) override;
+    void Update(Scene& scene, float elapsedTime) override;
+    void FixedUpdate(Scene& scene, float fixedDeltaTime) override;
+    void Uninitialize() override;
 
 private:
 
     AcademiaEngine* _EngineContext = nullptr;
 
-#ifdef ACADEMIA_EXAMPLE
-    // The Scene owns the object, we only keep a reference to it.
-    // Use _ExampleObject.lock() to access it: it returns nullptr once the object is destroyed.
-    std::weak_ptr<ExampleGameObject> _ExampleObject;
-#endif
+    // We added it, so we remove it (see Uninitialize)
+    ExampleGameObject* _ExampleObject = nullptr;
 
 };
-

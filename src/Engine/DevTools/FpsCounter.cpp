@@ -30,11 +30,11 @@ void FpsCounter::Draw(AcademiaEngine& engine) const
     const olc::Pixel color = fps >= GoodFps ? LabelColor : FpsColor(fps);
     const std::string text = Format("%.0f FPS", fps);
 
-    const olc::vi2d size = { TextWidth(text) + ChipPadding * 2, ChipHeight };
-    const olc::vi2d position = { engine.ScreenWidth() - ScreenMargin - size.x, ScreenMargin };
+    const Vector2i size = { TextWidth(text) + ChipPadding * 2, ChipHeight };
+    const Vector2i position = { engine.ScreenWidth() - ScreenMargin - size.x, ScreenMargin };
 
     engine.SetPixelMode(olc::Pixel::ALPHA);
     FillPanel(engine, position, size, olc::Pixel(0, 0, 0, 120));
     engine.SetPixelMode(olc::Pixel::NORMAL);
-    engine.DrawString(position + olc::vi2d{ ChipPadding, ChipPadding }, text, color, TextScale);
+    engine.DrawString(position + Vector2i{ ChipPadding, ChipPadding }, text, color, TextScale);
 }

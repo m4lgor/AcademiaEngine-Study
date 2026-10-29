@@ -1,5 +1,7 @@
 #pragma once
 
+#include "FixedTimestep.h"
+
 // Game time: pause and single step.
 // Every frame, the engine asks it whether gameplay should update and with which elapsed time.
 // Drawing is not affected: a paused game is still drawn.
@@ -21,7 +23,8 @@ public:
     // While paused, advances the game by one step of StepDeltaTime on the next frame
     void StepOneFrame();
 
-    static constexpr float StepDeltaTime = 1.0f / 60.0f;
+    // One step is exactly one fixed step, so stepping also gives the same result every time
+    static constexpr float StepDeltaTime = FixedTimestep::DeltaTime;
 
 private:
 
