@@ -22,7 +22,6 @@ bool AcademiaEngine::OnUserUpdate(float elapsedTime)
 {
     PreUpdate(elapsedTime);
     Update(elapsedTime);
-    DrawScene();
     PostUpdate(elapsedTime);
 
     return true;
@@ -72,15 +71,13 @@ void AcademiaEngine::FixedUpdate(float fixedDeltaTime)
         _Game->FixedUpdate(_Scene, fixedDeltaTime);
 }
 
-void AcademiaEngine::DrawScene()
-{
-    // After the simulation, so we draw what happened this frame. Also runs while paused.
-    _Scene.Draw(*this);
-}
-
 void AcademiaEngine::PostUpdate(float elapsedTime)
 {
     _Scene.FlushPending();
+
+    // After the simulation and the flush, so we draw what exists at the end of this frame.
+    // Also runs while paused.
+    _Scene.Draw(*this);
 
     _DevTools.Draw(*this);
 }

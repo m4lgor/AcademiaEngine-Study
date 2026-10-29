@@ -43,7 +43,6 @@ private:
     void PreUpdate(float elapsedTime);
     void Update(float elapsedTime);
     void FixedUpdate(float fixedDeltaTime);
-    void DrawScene();
     void PostUpdate(float elapsedTime);
 
     GamePtr _Game = nullptr;

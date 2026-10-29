@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AcademiaEngine Anatomy</title>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Silkscreen&display=swap">
+<style>
+/* Layout: a technical sheet. Single column of schematic panels, colour = which layer a part belongs to. */
+:root {
+  --bg: #eef1f5;
+  --sheet: #ffffff;
+  --ink: #18202c;
+  --muted: #5b6678;
+  --line: #d3d9e2;
+  --grid: #e4e8ee;
+  --engine: #2f6fd0;      /* provided engine code */
+  --engine-soft: #e3ecfa;
+  --game: #c7700f;        /* student game code */
+  --game-soft: #fbeedd;
+  --tools: #12897a;       /* dev tools */
+  --tools-soft: #dcf2ee;
+  --olc: #6b7486;         /* olc::PixelGameEngine */
+  --olc-soft: #eceef2;
+  --warn: #b88300;
+  --font-display: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131b; --sheet: #151c27; --ink: #e4e9f1; --muted: #93a0b4; --line: #2a3445; --grid: #1d2533;
+    --engine: #6aa2ff; --engine-soft: #1a2a45; --game: #f0a24a; --game-soft: #3a2a17;
+    --tools: #3cc7b4; --tools-soft: #12332f; --olc: #8e98ab; --olc-soft: #1e2532; --warn: #e6b740;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131b; --sheet: #151c27; --ink: #e4e9f1; --muted: #93a0b4; --line: #2a3445; --grid: #1d2533;
+  --engine: #6aa2ff; --engine-soft: #1a2a45; --game: #f0a24a; --game-soft: #3a2a17;
+  --tools: #3cc7b4; --tools-soft: #12332f; --olc: #8e98ab; --olc-soft: #1e2532; --warn: #e6b740;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+}
+.page { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.9em; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; max-width: 68ch; }
+
+/* Header */
+header { display: flex; flex-direction: column; gap: 14px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 6vw, 52px); line-height: 1.05; letter-spacing: 0.01em; }
+.lede { color: var(--muted); font-size: 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.sw-engine { background: var(--engine); } .sw-game { background: var(--game); } .sw-tools { background: var(--tools); } .sw-olc { background: var(--olc); }
+
+/* Panels */
+section.panel { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.panel-head { display: flex; flex-direction: column; gap: 6px; }
+h2 { font-size: 21px; font-weight: 600; }
+.panel-head p { color: var(--muted); }
+
+/* Ownership diagram */
+.box { border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.box-title { font-family: var(--font-mono); font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.box-title small { font-weight: 400; color: var(--muted); }
+.engine-box { border: 1.5px solid var(--engine); background: var(--sheet); }
+.engine-box > .box-title { color: var(--engine); }
+.modules { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.module { border-radius: 5px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; border: 1px solid transparent; }
+.module h3 { font-family: var(--font-mono); font-size: 14px; font-weight: 600; }
+.module p { font-size: 13px; color: var(--muted); }
+.module .api { font-family: var(--font-mono); font-size: 12px; color: var(--ink); opacity: 0.85; }
+.m-engine { background: var(--engine-soft); border-color: color-mix(in srgb, var(--engine) 30%, transparent); }
+.m-engine h3 { color: var(--engine); }
+.m-tools { background: var(--tools-soft); border-color: color-mix(in srgb, var(--tools) 30%, transparent); }
+.m-tools h3 { color: var(--tools); }
+.m-game { background: var(--game-soft); border-color: color-mix(in srgb, var(--game) 35%, transparent); }
+.m-game h3 { color: var(--game); }
+.sub-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tag { font-family: var(--font-mono); font-size: 11.5px; padding: 2px 7px; border-radius: 4px; background: var(--sheet); border: 1px solid var(--line); color: var(--ink); white-space: nowrap; }
+
+.owner-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: stretch; }
+.arrow-col { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12px; color: var(--muted); text-align: center; }
+.arrow { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.arrow .shaft { width: 46px; height: 0; border-top: 2px solid currentColor; position: relative; }
+.arrow .shaft.dashed { border-top-style: dashed; }
+.arrow .shaft::after { content: ""; position: absolute; right: -2px; top: -6px; border: 5px solid transparent; border-left: 7px solid currentColor; }
+.arrow.left .shaft::after { right: auto; left: -2px; border-left: 5px solid transparent; border-right: 7px solid currentColor; }
+.a-own { color: var(--engine); } .a-ref { color: var(--game); }
+
+/* Frame loop */
+.phases { display: grid; grid-template-columns: 1fr 1.35fr 1fr; gap: 12px; }
+.phase { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; background: var(--sheet); }
+.phase-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.phase-name span:last-child { color: var(--muted); font-weight: 400; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.step { display: grid; grid-template-columns: 4px 1fr; gap: 10px; align-items: stretch; }
+.step::before { content: ""; border-radius: 2px; background: var(--line); }
+.step.s-engine::before { background: var(--engine); }
+.step.s-game::before { background: var(--game); }
+.step.s-tools::before { background: var(--tools); }
+.step.s-olc::before { background: var(--olc); }
+.step div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.step code { font-size: 13px; overflow-wrap: anywhere; }
+.step small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.gate { border: 1.5px solid var(--engine); border-radius: 5px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.gate-q { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--engine); }
+.branches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.branch { border-radius: 4px; background: var(--engine-soft); padding: 6px 8px; font-size: 12px; line-height: 1.35; min-width: 0; }
+.branch b { display: block; font-family: var(--font-mono); font-size: 12px; }
+.branch .dt { font-family: var(--font-mono); color: var(--muted); }
+.always { font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+
+/* Lifecycle */
+.lifecycle { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; }
+.life { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding-right: 12px; }
+.life-dot { display: flex; align-items: center; }
+.life-dot i { width: 12px; height: 12px; border-radius: 50%; background: var(--engine); flex: none; }
+.life-dot::after { content: ""; height: 2px; background: var(--line); flex: 1; }
+.life:last-child .life-dot::after { display: none; }
+.life.loop .life-dot i { background: var(--tools); box-shadow: 0 0 0 4px var(--tools-soft); }
+.life.game .life-dot i { background: var(--game); }
+.life h3 { font-family: var(--font-mono); font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.life p { font-size: 13px; color: var(--muted); }
+.life p code { overflow-wrap: anywhere; }
+
+/* Spawn timeline */
+.frames-wrap { overflow-x: auto; }
+.frames { display: grid; grid-template-columns: 150px repeat(3, minmax(170px, 1fr)); min-width: 680px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.frames > div { padding: 10px 12px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 13px; }
+.frames > div:nth-child(4n) { border-right: none; }
+.frames > div.last { border-bottom: none; }
+.fh { font-family: var(--font-mono); font-weight: 600; background: var(--olc-soft); }
+.rowlabel { font-family: var(--font-mono); color: var(--muted); font-size: 12px; background: var(--olc-soft); }
+.state { display: inline-block; font-family: var(--font-mono); font-size: 11.5px; padding: 1px 6px; border-radius: 4px; margin-bottom: 4px; }
+.st-pending { background: var(--game-soft); color: var(--game); }
+.st-live { background: var(--engine-soft); color: var(--engine); }
+.st-gone { background: var(--olc-soft); color: var(--olc); border: 1px solid var(--line); }
+.cell-note { color: var(--muted); font-size: 12.5px; }
+
+/* World vs screen */
+.world { display: grid; grid-template-columns: minmax(0, 380px) 1fr; gap: 24px; align-items: start; }
+.world svg { width: 100%; height: auto; display: block; border-radius: 4px; }
+.facts { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+td code { white-space: nowrap; }
+.table-wrap { overflow-x: auto; }
+td.num { font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+
+/* Dev tools mock */
+.tools-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) 1fr; gap: 24px; align-items: start; }
+.screen { background: #05070a; border-radius: 6px; aspect-ratio: 16 / 10; max-width: 100%; position: relative; overflow: hidden; border: 1px solid var(--line); }
+.screen .tb { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; padding: 4px; background: rgba(16,18,26,0.85); border: 1px solid #465069; border-radius: 4px; }
+.screen .btn { width: 26px; height: 26px; border-radius: 3px; background: #323a4e; display: grid; place-items: center; }
+.screen .btn.gap { margin-left: 8px; }
+.screen .btn.on { background: #3c7dd2; }
+.screen .fps { position: absolute; top: 5%; right: 3%; font-family: var(--font-display); font-size: 12px; color: #8791a5; background: rgba(0,0,0,0.5); padding: 3px 6px; border-radius: 3px; }
+.screen .ball { position: absolute; left: 50%; top: 58%; width: 7%; aspect-ratio: 1; border-radius: 50%; background: #fff; transform: translate(-50%, -50%); }
+.screen .callout { position: absolute; font-family: var(--font-mono); font-size: 11px; color: #c9d2e0; }
+.keys { display: flex; flex-direction: column; gap: 8px; }
+.key-row { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: baseline; font-size: 13.5px; }
+kbd { font-family: var(--font-mono); font-size: 12px; font-weight: 600; text-align: center; padding: 2px 0; border-radius: 4px; background: var(--tools-soft); color: var(--tools); border: 1px solid color-mix(in srgb, var(--tools) 35%, transparent); }
+
+/* Folder layers */
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.layer { display: grid; grid-template-columns: 90px 120px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 14px; border-radius: 5px; border: 1px solid transparent; font-size: 13.5px; }
+.layer h3 { font-family: var(--font-mono); font-size: 14px; font-weight: 600; }
+.layer .mono { color: var(--muted); }
+.layer .uses { color: var(--muted); }
+.l-game { background: var(--game-soft); border-color: color-mix(in srgb, var(--game) 35%, transparent); } .l-game h3 { color: var(--game); }
+.l-engine { background: var(--engine-soft); border-color: color-mix(in srgb, var(--engine) 30%, transparent); } .l-engine h3 { color: var(--engine); }
+.l-physics { background: var(--tools-soft); border-color: color-mix(in srgb, var(--tools) 30%, transparent); } .l-physics h3 { color: var(--tools); }
+.l-math { background: var(--olc-soft); border-color: var(--line); } .l-math h3 { color: var(--olc); }
+
+footer { color: var(--muted); font-size: 13px; }
+
+@media (max-width: 860px) {
+  .phases { grid-template-columns: 1fr; }
+  .lifecycle { grid-template-columns: 1fr; gap: 14px; }
+  .life { display: grid; grid-template-columns: 12px 1fr; column-gap: 12px; padding-right: 0; }
+  .life-dot { grid-row: span 2; align-items: flex-start; padding-top: 3px; }
+  .life-dot::after { display: none; }
+  .world, .tools-grid { grid-template-columns: 1fr; }
+  .layer { grid-template-columns: 1fr; gap: 2px; }
+  .owner-row { grid-template-columns: 1fr; }
+  .arrow-col { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+}
+@media (max-width: 560px) {
+  section.panel { padding: 16px; }
+  .branches { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">engine-improvements · after commit e7c2cc0</div>
+    <h1>AcademiaEngine Anatomy</h1>
+    <p class="lede">How the base engine is put together today: who owns what, what happens every frame, how objects come and go, and how world units become pixels.</p>
+    <div class="legend" aria-label="Colour legend">
+      <span><i class="swatch sw-engine"></i>Engine (provided)</span>
+      <span><i class="swatch sw-game"></i>Game code (students)</span>
+      <span><i class="swatch sw-tools"></i>Dev tools</span>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="own-h">
+    <div class="panel-head">
+      <h2 id="own-h">Who owns what</h2>
+      <p>AcademiaEngine owns one instance of every engine system and runs the game it is given through the GameBase class, where student code starts.</p>
+    </div>
+
+    <div>
+      <div class="box engine-box">
+        <div class="box-title">AcademiaEngine <small>singleton · AcademiaEngine::GetInstance()</small></div>
+        <div class="modules">
+          <div class="module m-engine">
+            <h3>Scene</h3>
+            <p>Holds every GameObject. Add and Remove are deferred to the end of the frame.</p>
+            <span class="api">GetScene().Add&lt;T&gt;()</span>
+          </div>
+          <div class="module m-engine">
+            <h3>Camera</h3>
+            <p>World position at the screen center, zoom, pixels per unit. Plain fields.</p>
+            <span class="api">GetCamera().Position / Zoom</span>
+          </div>
+          <div class="module m-engine">
+            <h3>TimeControl</h3>
+            <p>Pause and single step. Decides each frame whether gameplay updates, and with which dt.</p>
+            <span class="api">GetTimeControl().SetPaused()</span>
+          </div>
+          <div class="module m-tools">
+            <h3>DevTools</h3>
+            <p>Debug keys and panels drawn over the game. Drives TimeControl, reads Scene and Camera.</p>
+            <div class="sub-list">
+              <span class="tag">FpsCounter</span><span class="tag">StatsPanel</span><span class="tag">PlayToolbar</span><span class="tag">DevToolsStyle</span>
+            </div>
+          </div>
+        </div>
+        <div class="module m-game">
+          <h3>GameManager</h3>
+          <p>Derives from the engine's <code>GameBase</code> class. <code>main()</code> hands it over with <code>SetGame</code>, so the engine never includes the Game folder. <code>Initialize</code> once, <code>Update(dt)</code> every gameplay frame, <code>Uninitialize</code> at exit.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="owner-row">
+      <div class="module m-engine">
+        <h3>Scene</h3>
+        <p><code>std::vector&lt;unique_ptr&lt;GameObject&gt;&gt;</code>. The only owner: it deletes an object at the end of the frame after <code>Remove</code>.</p>
+      </div>
+      <div class="arrow-col">
+        <div class="arrow a-own"><span>owns</span><span class="shaft"></span></div>
+        <div class="arrow left a-ref"><span class="shaft dashed"></span><span>pointer to</span></div>
+      </div>
+      <div class="module m-game">
+        <h3>GameObjects</h3>
+        <p><code>Update(dt)</code>, <code>Draw(engine)</code>, <code>Position</code>. Whoever calls <code>Add</code> keeps the raw pointer it returns and calls <code>Remove</code> when done.</p>
+        <div class="sub-list"><span class="tag">ExampleGameObject</span><span class="tag">your objects…</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="frame-h">
+    <div class="panel-head">
+      <h2 id="frame-h">One frame</h2>
+      <p><code>OnUserUpdate(elapsedTime)</code> runs three phases in order. Pausing skips gameplay only: the scene is still drawn and the tools still respond.</p>
+    </div>
+
+    <div class="phases">
+      <div class="phase">
+        <div class="phase-name"><span>PreUpdate</span><span>input &amp; clear</span></div>
+        <ol class="steps">
+          <li class="step s-tools"><div><code>DevTools.HandleInput</code><small>F1 / F2 / F3 and toolbar clicks</small></div></li>
+          <li class="step s-tools"><div><code>DevTools.Update(dt)</code><small>FpsCounter averages the real frame time over 0.25 s</small></div></li>
+          <li class="step s-engine"><div><code>Clear(BLACK)</code><small>fresh frame</small></div></li>
+        </ol>
+      </div>
+
+      <div class="phase">
+        <div class="phase-name"><span>Update</span><span>gameplay</span></div>
+        <div class="gate">
+          <div class="gate-q">TimeControl.Tick(dt)?</div>
+          <div class="branches">
+            <div class="branch"><b>running</b>update with <span class="dt">real dt</span></div>
+            <div class="branch"><b>paused</b>skip gameplay, <span class="dt">dt = 0</span></div>
+            <div class="branch"><b>step (F3)</b>one update and one fixed step, <span class="dt">1/60 s</span></div>
+          </div>
+          <ol class="steps">
+            <li class="step s-game"><div><code>GameManager.Update(scene, dt)</code><small>student game logic, then it calls the base version</small></div></li>
+            <li class="step s-game"><div><code>GameBase::Update(scene, dt)</code><small>calls <code>Scene.Update</code>: every live GameObject's <code>Update</code></small></div></li>
+            <li class="step s-engine"><div><code>FixedTimestep.Advance(dt)</code><small>how many fixed steps are owed: zero, one or several</small></div></li>
+            <li class="step s-game"><div><span><code>FixedUpdate(1/60)</code>, once per step</span><small>GameManager, which calls <code>GameBase::FixedUpdate</code> to reach every live GameObject. The physics step goes right after, so gameplay always comes first.</small></div></li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-name"><span>PostUpdate</span><span>commit &amp; draw</span></div>
+        <ol class="steps">
+          <li class="step s-engine"><div><code>Scene.FlushPending</code><small>apply Clear, delete removed objects, add new ones</small></div></li>
+          <li class="step s-game"><div><code>Scene.Draw(engine)</code><small>every live GameObject's <code>Draw</code>, always, even when paused. Drawn after the flush, so it shows the end of the frame.</small></div></li>
+          <li class="step s-tools"><div><code>DevTools.Draw</code><small>FPS counter always; toolbar and stats panel unless hidden with F1</small></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="life-h">
+    <div class="panel-head">
+      <h2 id="life-h">From launch to exit</h2>
+      <p>The whole program, start to finish. Objects added in <code>Initialize</code> are flushed right away, so they exist on the first frame.</p>
+    </div>
+    <div class="lifecycle">
+      <div class="life"><div class="life-dot"><i></i></div><h3>main()</h3><p><code>AcademiaEngine::Instantiate()</code> creates the singleton, then <code>SetGame</code> gives it the GameManager.</p></div>
+      <div class="life"><div class="life-dot"><i></i></div><h3>Construct</h3><p>1024 × 1024 window, 1 screen pixel per pixel.</p></div>
+      <div class="life"><div class="life-dot"><i></i></div><h3>Start</h3><p>Runs the frame loop. Returns when the window closes.</p></div>
+      <div class="life game"><div class="life-dot"><i></i></div><h3>OnUserCreate</h3><p>The game's <code>Initialize(this)</code>, then <code>FlushPending</code>.</p></div>
+      <div class="life loop"><div class="life-dot"><i></i></div><h3>Frame loop</h3><p>The three phases above, as fast as the machine allows. <code>Update</code> runs every frame, <code>FixedUpdate</code> a constant 60 times per second.</p></div>
+      <div class="life game"><div class="life-dot"><i></i></div><h3>OnUserDestroy</h3><p><code>Uninitialize()</code>, then <code>ReportLeaks</code> lists any object that was added but never removed.</p></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="spawn-h">
+    <div class="panel-head">
+      <h2 id="spawn-h">Adding and removing, frame by frame</h2>
+      <p>Changes to the object list wait for the end of the frame, so a GameObject can add a bullet from inside its own <code>Update</code> without breaking the loop.</p>
+    </div>
+    <div class="frames-wrap">
+      <div class="frames" role="table" aria-label="Object state across three frames">
+        <div class="fh" role="columnheader"></div>
+        <div class="fh" role="columnheader">Frame N</div>
+        <div class="fh" role="columnheader">Frame N+1</div>
+        <div class="fh" role="columnheader">Frame N+2</div>
+
+        <div class="rowlabel" role="rowheader">During Update</div>
+        <div><span class="state st-pending">pending</span><br><code>Add&lt;Bullet&gt;()</code> returns a pointer. The object is not updated yet.</div>
+        <div><span class="state st-live">live</span><br>Updated and drawn. When it is done, its creator calls <code>Remove(bullet)</code>; it is skipped from now on.</div>
+        <div><span class="state st-gone">gone</span><br>Deleted. Any pointer still held to it dangles, so set yours to <code>nullptr</code> after <code>Remove</code>.</div>
+
+        <div class="rowlabel last" role="rowheader">End of frame</div>
+        <div class="last"><code>FlushPending</code> adds it to the Scene, then it is drawn for the first time.</div>
+        <div class="last">Skipped by <code>Update</code> from now on. <code>FlushPending</code> deletes it before <code>Draw</code>, so it is not drawn this frame.</div>
+        <div class="last cell-note">Nothing left to do.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="world-h">
+    <div class="panel-head">
+      <h2 id="world-h">World units and pixels</h2>
+      <p>Game code thinks in world units with Y pointing up. Only drawing converts to pixels, through the camera.</p>
+    </div>
+    <div class="world">
+      <svg viewBox="-40 -30 1110 1100" role="img" aria-label="The 1024 pixel window at zoom 1 shows world coordinates from minus 10.24 to plus 10.24 on both axes, with the camera at the center">
+        <defs>
+          <pattern id="unitgrid" x="12" y="12" width="50" height="50" patternUnits="userSpaceOnUse">
+            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="var(--grid)" stroke-width="2"/>
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="1024" height="1024" fill="var(--sheet)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="0" y="0" width="1024" height="1024" fill="url(#unitgrid)"/>
+        <line x1="512" y1="0" x2="512" y2="1024" stroke="var(--olc)" stroke-width="3"/>
+        <line x1="0" y1="512" x2="1024" y2="512" stroke="var(--olc)" stroke-width="3"/>
+        <!-- Y up arrow -->
+        <line x1="512" y1="512" x2="512" y2="330" stroke="var(--engine)" stroke-width="8"/>
+        <polygon points="512,300 494,340 530,340" fill="var(--engine)"/>
+        <text x="530" y="330" fill="var(--engine)" font-family="IBM Plex Mono, monospace" font-size="40" font-weight="600">+Y</text>
+        <line x1="512" y1="512" x2="694" y2="512" stroke="var(--engine)" stroke-width="8"/>
+        <polygon points="724,512 684,494 684,530" fill="var(--engine)"/>
+        <text x="690" y="570" fill="var(--engine)" font-family="IBM Plex Mono, monospace" font-size="40" font-weight="600">+X</text>
+        <!-- camera -->
+        <circle cx="512" cy="512" r="20" fill="var(--sheet)" stroke="var(--engine)" stroke-width="6"/>
+        <circle cx="512" cy="512" r="6" fill="var(--engine)"/>
+        <text x="300" y="470" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="34">camera (0, 0)</text>
+        <!-- one unit bracket -->
+        <line x1="762" y1="812" x2="812" y2="812" stroke="var(--game)" stroke-width="6"/>
+        <line x1="762" y1="796" x2="762" y2="828" stroke="var(--game)" stroke-width="6"/>
+        <line x1="812" y1="796" x2="812" y2="828" stroke="var(--game)" stroke-width="6"/>
+        <text x="700" y="880" fill="var(--game)" font-family="IBM Plex Mono, monospace" font-size="34">1 unit = 50 px</text>
+        <!-- example object, radius 0.4 units = 20 px, at (-4, 2) -->
+        <circle cx="312" cy="412" r="20" fill="var(--game)"/>
+        <text x="200" y="380" fill="var(--game)" font-family="IBM Plex Mono, monospace" font-size="30">(-4, 2)</text>
+        <!-- corners -->
+        <text x="10" y="-6" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="30">(-10.24, 10.24)</text>
+        <text x="760" y="1062" fill="var(--muted)" font-family="IBM Plex Mono, monospace" font-size="30">(10.24, -10.24)</text>
+      </svg>
+
+      <div class="facts">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Camera field</th><th>Default</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>Position</code></td><td class="num">(0, 0)</td><td>World point shown at the screen center</td></tr>
+              <tr><td><code>Zoom</code></td><td class="num">1.0</td><td>2 = everything twice as big. Floor of 0.001</td></tr>
+              <tr><td><code>PixelsPerUnit</code></td><td class="num">50</td><td>Pixels per world unit at zoom 1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Engine helper</th><th>Use it for</th></tr></thead>
+            <tbody>
+              <tr><td><code>ConvertWorldPositionToPixels</code></td><td>Where to draw an object</td></tr>
+              <tr><td><code>ConvertWorldLengthToPixels</code></td><td>Radius, width, line length</td></tr>
+              <tr><td><code>ConvertPixelsToWorldPosition</code></td><td>Mouse clicks into the world</td></tr>
+              <tr><td><code>ConvertPixelsToWorldLength</code></td><td>Pixel distances into units</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="cell-note">Text drawn with raw pixel coordinates ignores the camera, which is what a HUD wants.</p>
+        <p class="cell-note">World positions and sizes are <code>Vector2f</code>. Pixel positions are <code>Vector2i</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="tools-h">
+    <div class="panel-head">
+      <h2 id="tools-h">Dev tools on screen</h2>
+      <p>What you see by default: a quiet FPS counter and the toolbar. The stats panel opens from the toolbar.</p>
+    </div>
+    <div class="tools-grid">
+      <div class="screen" role="img" aria-label="Game window with the toolbar at the top center and the FPS counter at the top right">
+        <div class="tb">
+          <div class="btn"><svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="2" width="3.5" height="10" fill="#ebeef5"/><rect x="8.5" y="2" width="3.5" height="10" fill="#ebeef5"/></svg></div>
+          <div class="btn"><svg width="14" height="14" viewBox="0 0 14 14"><polygon points="2,2 2,12 9,7" fill="#505870"/><rect x="10" y="2" width="2.5" height="10" fill="#505870"/></svg></div>
+          <div class="btn gap"><svg width="14" height="14" viewBox="0 0 14 14"><rect x="1.5" y="8" width="3" height="5" fill="#ebeef5"/><rect x="5.5" y="2" width="3" height="11" fill="#ebeef5"/><rect x="9.5" y="5" width="3" height="8" fill="#ebeef5"/></svg></div>
+        </div>
+        <div class="fps">405 FPS</div>
+        <div class="ball"></div>
+        <div class="callout" style="left:50%; top:24%; transform:translateX(-50%);">pause · step · stats</div>
+      </div>
+      <div class="keys">
+        <div class="key-row"><kbd>F1</kbd><span>Show or hide the toolbar and stats panel. The FPS counter stays.</span></div>
+        <div class="key-row"><kbd>F2</kbd><span>Pause or resume. Same as the pause button, which turns blue while paused.</span></div>
+        <div class="key-row"><kbd>F3</kbd><span>While paused, run one update and one fixed step of exactly 1/60 s. Same as the step button.</span></div>
+        <div class="key-row"><kbd>▮▮▮</kbd><span>Stats button: FPS and frame time, object count, camera, zoom, mouse in world units.</span></div>
+        <p class="cell-note">The FPS counter is grey when healthy, amber under 55 FPS, red under 30.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="dep-h">
+    <div class="panel-head">
+      <h2 id="dep-h">Folders and dependencies</h2>
+      <p>Each folder may only include folders below it. Nothing includes upwards, and no two folders include each other.</p>
+    </div>
+    <div class="stack">
+      <div class="layer l-game"><h3>Game</h3><span class="mono">src/Game</span><span>Your gameplay: GameManager and your own objects.</span><span class="uses">May use Engine, Physics, Math</span></div>
+      <div class="layer l-engine"><h3>Engine</h3><span class="mono">src/Engine</span><span>Loop, Scene, GameObject, Camera, TimeControl, DevTools, the GameBase class.</span><span class="uses">May use Physics, Math</span></div>
+      <div class="layer l-physics"><h3>Physics</h3><span class="mono">src/Physics</span><span>Everything physics you implement in the course. The folder is created when you start.</span><span class="uses">May use Math</span></div>
+      <div class="layer l-math"><h3>Math</h3><span class="mono">src/Math</span><span><code>Vector2f</code>, <code>Vector2d</code>, <code>Vector2i</code>, <code>Vector2u</code>.</span><span class="uses">Uses nothing from src/</span></div>
+    </div>
+    <p><code>main.cpp</code> sits above all of them. It is where the engine and the game are connected with <code>SetGame</code>. Run <code>tools/CheckDependencies.ps1</code> to list any include that goes the wrong way and any cycle.</p>
+  </section>
+
+  <footer>Still to come from the plan: time scale and slow motion, built-in shapes, more math helpers, and the physics in <code>src/Physics</code>.</footer>
+</div>
+</body>
+</html>

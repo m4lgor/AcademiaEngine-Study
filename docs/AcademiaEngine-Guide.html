@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AcademiaEngine Guide</title>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column with a sticky section list on wide screens; code and tables scroll inside their own boxes. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --fg: #151a24;
+  --muted: #5a6475;
+  --line: #d9dee7;
+  --accent: #2f6fd1;
+  --accent-soft: #e3edfb;
+  --code-bg: #0f141d;
+  --code-fg: #dbe4f3;
+  --good: #1f8f52;
+  --warn: #b86a00;
+  --warn-soft: #fbeed7;
+  --font-body: "Familjen Grotesk", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1118; --surface: #151a24; --fg: #e6ebf4; --muted: #9aa5b8; --line: #283042;
+    --accent: #6ea4f5; --accent-soft: #1a2640; --code-bg: #0a0d13; --code-fg: #dbe4f3;
+    --good: #5bd08a; --warn: #f0b04a; --warn-soft: #33270f; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1118; --surface: #151a24; --fg: #e6ebf4; --muted: #9aa5b8; --line: #283042;
+  --accent: #6ea4f5; --accent-soft: #1a2640; --code-bg: #0a0d13; --code-fg: #dbe4f3;
+  --good: #5bd08a; --warn: #f0b04a; --warn-soft: #33270f; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  padding-block: 40px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 48px; }
+nav { position: sticky; top: 24px; align-self: start; display: flex; flex-direction: column; gap: 2px; font-size: 15px; }
+nav b { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+nav a { color: var(--muted); text-decoration: none; padding: 4px 0 4px 12px; border-left: 2px solid var(--line); }
+nav a:hover, nav a:focus-visible { color: var(--accent); border-left-color: var(--accent); outline: none; }
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.05; margin: 0 0 12px; letter-spacing: -.02em; text-wrap: balance; }
+h2 { font-size: 27px; line-height: 1.2; margin: 0 0 14px; letter-spacing: -.01em; text-wrap: balance; }
+h3 { font-size: 18px; margin: 24px 0 6px; }
+p { margin: 0 0 14px; max-width: 68ch; }
+.lead { font-size: 20px; color: var(--muted); max-width: 60ch; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
+pre { background: var(--code-bg); color: var(--code-fg); border-radius: 8px; padding: 16px 18px; overflow-x: auto; margin: 0 0 16px; font-size: 14px; line-height: 1.55; }
+pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+.k { color: #7fb0ff; } .c { color: #7d8aa3; } .s { color: #8ee0a8; }
+.tablebox { overflow-x: auto; margin-bottom: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.note { background: var(--warn-soft); border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; max-width: 68ch; }
+.note b { color: var(--warn); }
+.why { border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 12px 18px; margin: 0 0 16px; max-width: 68ch; }
+.why b { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 500; display: block; margin-bottom: 4px; }
+.why p { margin: 0 0 8px; }
+.why p:last-child { margin: 0; }
+.keys { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.key { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; }
+kbd { font-family: var(--font-mono); font-size: 13px; background: var(--accent-soft); color: var(--accent); border-radius: 4px; padding: 2px 8px; font-weight: 500; }
+.frame { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.frame li { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.frame li:last-child { border-bottom: 0; }
+.frame .ph { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; }
+.frame span { min-width: 0; }
+.axes { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+.axes > div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 18px; flex: 1 1 260px; min-width: 0; }
+.axes h3 { margin-top: 0; }
+@media (max-width: 800px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 6px 16px; }
+  nav b { width: 100%; }
+  nav a { border-left: 0; padding: 0; }
+  .frame li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Sections">
+  <b>Contents</b>
+  <a href="#start">Run it</a>
+  <a href="#where">Where you code</a>
+  <a href="#objects">GameObjects</a>
+  <a href="#scene">Scene</a>
+  <a href="#space">World space</a>
+  <a href="#frame">One frame</a>
+  <a href="#fixed">Update and FixedUpdate</a>
+  <a href="#time">Pause and step</a>
+  <a href="#devtools">Dev tools</a>
+  <a href="#rules">Rules</a>
+</nav>
+
+<main>
+<header>
+  <div class="eyebrow">Course engine reference</div>
+  <h1>AcademiaEngine</h1>
+  <p class="lead">AcademiaEngine runs the game loop, keeps track of your objects and converts positions into pixels for drawing. You write the game inside it.</p>
+</header>
+
+<section id="start">
+  <h2>Run it</h2>
+  <p>Open <code>AcademiaEngine.sln</code> in Visual Studio, pick <code>Debug | x64</code> and press F5. A 1024 by 1024 window opens with one white circle in the middle. That circle is the example object.</p>
+  <p>You are free to read and change the engine, including <code>main.cpp</code> and <code>src/Engine</code>. The goal of this course is that you understand how it works and why it is built this way, so read it. Gameplay lives in <code>src/Game</code> and everything physics lives in <code>src/Physics</code>.</p>
+</section>
+
+<section id="where">
+  <h2>Where you code</h2>
+  <div class="tablebox"><table>
+    <tr><th>File</th><th>What it is for</th></tr>
+    <tr><td><code>src/Game/GameManager.cpp</code></td><td>Your entry point. It derives from the engine's <code>GameBase</code> class, and <code>main.cpp</code> hands it to the engine with <code>SetGame</code>. <code>Initialize</code> runs once at start, <code>Update</code> runs every frame, <code>Uninitialize</code> runs at exit. Add your objects in <code>Initialize</code> and remove them in <code>Uninitialize</code>. Read keyboard input in <code>Update</code>.</td></tr>
+    <tr><td><code>src/Engine/GameObject.h</code></td><td>The base class of everything in your game. Derive from it. It lives in the engine because the engine's Scene owns every GameObject.</td></tr>
+    <tr><td><code>src/Game/ExampleGameObject.*</code></td><td>The white circle. Read it as a template, then delete it along with the lines that use it in <code>GameManager</code>.</td></tr>
+    <tr><td><code>src/Math/</code></td><td>Basic building blocks shared by every folder. For now it holds <code>Vector2f</code> and <code>Vector2i</code>. It depends on nothing else in <code>src/</code>.</td></tr>
+    <tr><td><code>src/Physics/</code></td><td>All the physics you implement in this course goes here, kept apart from the engine and from gameplay.</td></tr>
+    <tr><td><code>src/Engine/</code></td><td>The engine: window, loop, Scene, Camera, time control, dev tools. You can change it, but know why before you do. The sections below explain the reasoning.</td></tr>
+  </table></div>
+</section>
+
+<section id="objects">
+  <h2>GameObjects</h2>
+  <p>Anything that exists in your game (a player, a bullet, a wall) is a class that derives from <code>GameObject</code>. It has a <code>Position</code> in world units and two functions you can override: <code>Update(elapsedTime)</code> for behavior and <code>Draw(engine)</code> for rendering. The engine calls both for you on every object in the Scene.</p>
+<pre><code><span class="k">class</span> Player : <span class="k">public</span> GameObject
+{
+<span class="k">public</span>:
+    <span class="k">void</span> Update(<span class="k">float</span> elapsedTime) <span class="k">override</span>
+    {
+        <span class="c">// Move right at 3 world units per second</span>
+        Position.x += 3.0f * elapsedTime;
+    }
+
+    <span class="k">void</span> Draw(AcademiaEngine&amp; engine) <span class="k">override</span>
+    {
+        Vector2i pixels = engine.ConvertWorldPositionToPixels(Position);
+        <span class="k">int</span> radius = (<span class="k">int</span>)engine.ConvertWorldLengthToPixels(0.4f);
+        engine.FillCircle(pixels, radius, olc::YELLOW);
+    }
+};</code></pre>
+  <p>Always multiply movement by <code>elapsedTime</code>. The game then moves at the same speed on a slow or a fast computer.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>You never write the game loop. The engine owns it and calls your <code>Update</code> and <code>Draw</code>. This is called inversion of control: the engine is a framework that calls you, not a library you call.</p>
+    <p>The benefit is that the engine can change what happens around your code (pause it, step it, draw tools over it) without you changing a line. Update and Draw are separate functions so that logic can stop while the picture stays on screen.</p>
+  </div>
+  <div class="note"><b>New file?</b> Add it to the project (right-click <code>src/Game</code>, Add, New Item), or it will not compile.</div>
+</section>
+
+<section id="scene">
+  <h2>Scene</h2>
+  <p>The Scene holds every GameObject. Get it with <code>_EngineContext->GetScene()</code> inside <code>GameManager</code>.</p>
+<pre><code><span class="c">// In GameManager::Initialize</span>
+_Player = _EngineContext-&gt;GetScene().Add&lt;Player&gt;();   <span class="c">// Player* _Player member</span>
+_Player-&gt;Position = { <span class="k">0.0f</span>, <span class="k">0.0f</span> };
+
+<span class="c">// In GameManager::Uninitialize</span>
+_EngineContext-&gt;GetScene().Remove(_Player);
+_Player = <span class="k">nullptr</span>;</code></pre>
+  <div class="tablebox"><table>
+    <tr><th>Call</th><th>What it does</th></tr>
+    <tr><td><code>Add&lt;T&gt;(args...)</code></td><td>Creates an object of type <code>T</code> and returns a pointer to it. Constructor arguments are passed through.</td></tr>
+    <tr><td><code>Remove(object)</code></td><td>The object is deleted at the end of the frame. Do not use the pointer after this call.</td></tr>
+    <tr><td><code>Clear()</code></td><td>Removes every object, for example to start a new level.</td></tr>
+    <tr><td><code>GetObjectCount()</code></td><td>How many objects are alive. Shown in the stats panel.</td></tr>
+  </table></div>
+  <h3>Whoever adds an object removes it</h3>
+  <p>This works like <code>new</code> and <code>delete</code>. The code that calls <code>Add</code> is responsible for calling <code>Remove</code>, usually in <code>Uninitialize</code>. The pointer you get is only a view of the object: set it to <code>nullptr</code> after you remove it.</p>
+  <p>If you forget, the engine tells you when the game closes, with the name of each object left behind:</p>
+<pre><code>Scene: 1 object(s) were added but never removed. Whoever calls Scene::Add must call Scene::Remove.
+  - class Player</code></pre>
+  <p>An object does not remove itself. If a gun adds bullets, the gun keeps track of them and removes them.</p>
+  <h3>Add and Remove wait for the end of the frame</h3>
+  <p>An added object is updated from the next frame, and drawn at the end of this one. A removed object is skipped for the rest of this frame and deleted at the end of it. This makes both safe to call from inside an <code>Update</code>.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>Add and Remove wait because the Scene is looping over its list of objects while your <code>Update</code> runs. Adding or removing an item from a list while you loop over it breaks the loop. Waiting until the loop is finished makes it safe.</p>
+    <p>Only the code that added an object may remove it. That means there is one place that decides when the object ends, so a pointer you keep can never be left pointing at freed memory by someone else. A pointer that you keep after calling <code>Remove</code> would, so set it to <code>nullptr</code>.</p>
+    <p>The leak report at shutdown does what a memory checker does: it tells you who forgot to clean up.</p>
+  </div>
+</section>
+
+<section id="space">
+  <h2>World space and pixels</h2>
+  <p>You place things in <strong>world units</strong>. The engine converts them to pixels when it draws.</p>
+  <div class="axes">
+    <div><h3>World space</h3><p>Units. Y points up. (0, 0) is the center of the screen. By default 1 unit is 50 pixels, so the window shows about 20 by 20 units.</p></div>
+    <div><h3>Screen space</h3><p>Pixels. Y points down. (0, 0) is the top-left corner. This is what <code>GetMouseX()</code> and the drawing functions use.</p></div>
+  </div>
+  <div class="tablebox"><table>
+    <tr><th>Engine function</th><th>Use it to</th></tr>
+    <tr><td><code>ConvertWorldPositionToPixels(pos)</code></td><td>Find where to draw an object</td></tr>
+    <tr><td><code>ConvertPixelsToWorldPosition(px)</code></td><td>Turn the mouse position into a world position</td></tr>
+    <tr><td><code>ConvertWorldLengthToPixels(len)</code></td><td>Convert a radius or a width</td></tr>
+    <tr><td><code>ConvertPixelsToWorldLength(len)</code></td><td>The reverse, for sizes</td></tr>
+  </table></div>
+  <h3>Vectors</h3>
+  <p>A vector holds two numbers, <code>x</code> and <code>y</code>. There are four kinds, defined in <code>src/Math/Vector.h</code>:</p>
+  <div class="tablebox"><table>
+    <tr><th>Type</th><th>Holds</th><th>Use it for</th></tr>
+    <tr><td><code>Vector2f</code></td><td>two floats</td><td>World positions and sizes, like <code>Position</code>. The default choice.</td></tr>
+    <tr><td><code>Vector2d</code></td><td>two doubles</td><td>The same with more precision, when small errors add up.</td></tr>
+    <tr><td><code>Vector2i</code></td><td>two ints</td><td>Pixel positions on the screen.</td></tr>
+    <tr><td><code>Vector2u</code></td><td>two unsigned ints</td><td>Sizes and counts that are never negative.</td></tr>
+  </table></div>
+  <p>They all support <code>+ - * /</code> and have <code>mag()</code>, <code>mag2()</code>, <code>norm()</code>, <code>perp()</code>, <code>dot(v)</code>, <code>cross(v)</code>, <code>reflect(normal)</code> and <code>lerp(v, t)</code>.</p>
+  <h3>Camera</h3>
+  <p><code>GetCamera()</code> has three settings: <code>Position</code> (the world point shown at the center), <code>Zoom</code> (2.0 draws everything twice as big) and <code>PixelsPerUnit</code>. Every conversion above takes them into account, so objects follow the camera as long as you draw through those functions.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>Physics formulas have real units: a speed of 3 means 3 units per second, a gravity of 9.8 means 9.8 units per second squared. If you computed in pixels, the same simulation would behave differently at another window size or zoom.</p>
+    <p>Keeping simulation in world units and converting only at drawing time means the physics never knows what the screen looks like. Y points up in the world because that is how math and physics are written, so formulas copied from a textbook work as they are.</p>
+  </div>
+</section>
+
+<section id="frame">
+  <h2>What happens in one frame</h2>
+  <ol class="frame">
+    <li><span class="ph">Pre-update</span><span>Dev tools read their keys and mouse clicks. The screen is cleared to black.</span></li>
+    <li><span class="ph">Update</span><span>The time control decides whether the game runs. If it does: <code>GameManager::Update</code>, which ends by calling <code>GameBase::Update</code> to update every GameObject.</span></li>
+    <li><span class="ph">Fixed updates</span><span>Zero, one or several times, always 1/60 s: <code>GameManager::FixedUpdate</code>, which calls <code>GameBase::FixedUpdate</code> to run <code>FixedUpdate</code> on every GameObject. The physics step comes right after each one.</span></li>
+    <li><span class="ph">Post-update</span><span>Pending additions and removals are applied. Then <code>Draw</code> is called on every GameObject. This runs even while paused. The dev tools are drawn on top.</span></li>
+  </ol>
+  <p>Order inside a frame matters: the code you write in <code>GameManager::Update</code> runs first, then <code>GameBase::Update</code> updates the objects.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>Additions and removals are applied after everything has updated and before drawing, so no object appears or vanishes in the middle of a frame, and the picture shows the state at the end of it. The dev tools draw last so they stay on top of the game.</p>
+    <p>Drawing is outside the "does gameplay run" check. That is what lets you pause and still see the scene.</p>
+  </div>
+</section>
+
+<section id="fixed">
+  <h2>Update and FixedUpdate</h2>
+  <p>The GameManager and every GameObject have two functions that run during a frame:</p>
+  <div class="tablebox"><table>
+    <tr><th>Function</th><th>Runs</th><th>Delta time</th><th>Use it for</th></tr>
+    <tr><td><code>Update(elapsedTime)</code></td><td>Once per frame</td><td>The real frame time. It changes every frame.</td><td>Reading input, deciding what to do, anything that does not need to be exact.</td></tr>
+    <tr><td><code>FixedUpdate(fixedDeltaTime)</code></td><td>Zero, one or several times per frame</td><td>Always 1/60 s.</td><td>Applying forces and velocities, anything that feeds the physics.</td></tr>
+  </table></div>
+  <p>The order inside a frame is always the same:</p>
+<pre><code>Update              <span class="c">once: read input, decide</span>
+FixedUpdate         <span class="c">repeated: apply forces and velocities</span>
+physics step        <span class="c">repeated: we add this in class, right after FixedUpdate</span>
+Draw                <span class="c">once: shows the result of this frame</span></code></pre>
+  <div class="note"><b>Gameplay comes before the physics.</b> Anything you decide, apply or change must be done before the simulation runs. A force applied after the physics step has no effect until the next step.</div>
+  <h3>Call the base version</h3>
+  <p><code>GameManager</code> overrides <code>Update</code> and <code>FixedUpdate</code> from <code>GameBase</code>. The base versions are the ones that update every GameObject of the Scene, so your override must call them:</p>
+<pre><code><span class="k">void</span> GameManager::Update(Scene&amp; scene, <span class="k">float</span> elapsedTime)
+{
+    <span class="c">// your code: read input, decide what to do</span>
+
+    GameBase::Update(scene, elapsedTime);   <span class="c">// then update every GameObject</span>
+}</code></pre>
+  <p>Without that line no object updates. Where you put the call sets the order: code before it runs before the objects, code after it runs after. This is the general rule for overriding a function in C++: unless you mean to replace what the parent does, call the parent's version.</p>
+  <p>A fast computer runs a frame in 3 ms, so most frames run no fixed step at all. A slow frame of 50 ms runs three. Either way the simulation advances 60 steps per second.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>Physics gives different results for different time steps. If the step changed with the frame rate, the same game would behave differently on every computer, and a large step can make the simulation explode. A constant step makes the simulation repeat exactly, which is also what lets you debug it.</p>
+    <p>Input goes in <code>Update</code> because a key press lasts one frame. A frame can run zero fixed steps, and the press would be missed, or two, and it would be applied twice. So <code>Update</code> notes what the player wants and <code>FixedUpdate</code> applies it.</p>
+    <p>A very long frame, like a stop at a breakpoint, is cut to 0.25 s. The game slows down for a moment instead of running hundreds of steps to catch up.</p>
+  </div>
+</section>
+
+<section id="time">
+  <h2>Pause and single step</h2>
+  <p>The time control can stop gameplay while the screen keeps drawing. Use it to look at a situation frame by frame.</p>
+  <ul>
+    <li>While paused, your <code>Update</code> functions do not run.</li>
+    <li>A step runs one <code>Update</code> and exactly one <code>FixedUpdate</code>, of 1/60 of a second, whatever the real frame time was.</li>
+    <li>Code you need to run even when paused (for example opening a menu) should not rely on <code>elapsedTime</code> from the game.</li>
+  </ul>
+  <p>From code: <code>GetTimeControl().SetPaused(true)</code>, <code>TogglePause()</code>, <code>StepOneFrame()</code>.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>A step is always 1/60 s, not the real time since the last frame. A real frame time changes every frame, so two steps would never give the same result. With a fixed step, you can press F3 again and again, or call <code>StepOneFrame()</code>, and watch the exact same motion.</p>
+    <p>This is also how you will debug physics: pause, step one tick, and check where each object went.</p>
+  </div>
+</section>
+
+<section id="devtools">
+  <h2>Dev tools</h2>
+  <p>A small toolbar at the top of the window has three buttons: pause, step and stats. The FPS number sits at the top right. The stats panel is hidden until you press its button.</p>
+  <div class="keys">
+    <div class="key"><kbd>F1</kbd> show or hide the tools</div>
+    <div class="key"><kbd>F2</kbd> pause or resume</div>
+    <div class="key"><kbd>F3</kbd> step, while paused</div>
+  </div>
+  <p>The stats panel shows FPS and frame time, object count, camera position, zoom and the mouse position in world units. The keys work even when the tools are hidden.</p>
+  <div class="why"><b>Why it works this way</b>
+    <p>The dev tools only display things and press the engine's own controls (time control, camera). They keep no game state. That means you can remove them, or hide them, and the game behaves the same.</p>
+    <p>They look at the real frame time, not the paused game time, so the FPS counter keeps moving while the game is stopped.</p>
+  </div>
+  <div class="note"><b>Avoid F1 to F3 in your game.</b> The engine already uses them.</div>
+</section>
+
+<section id="rules">
+  <h2>Rules to remember</h2>
+  <ul>
+    <li>Gameplay code goes in <code>src/Game</code>. Physics code goes in <code>src/Physics</code>.</li>
+    <li>Dependencies go one way: Game uses Engine, Engine uses Physics, Physics uses Math, Math uses nothing from <code>src/</code>. Run <code>tools/CheckDependencies.ps1</code> to check it.</li>
+    <li>Engine code is open to you. Before changing it, be able to explain why the current design exists.</li>
+    <li>Position things in world units. Convert to pixels only when drawing.</li>
+    <li>Multiply movement by <code>elapsedTime</code>.</li>
+    <li>When you override <code>Update</code> or <code>FixedUpdate</code> in <code>GameManager</code>, call the <code>GameBase</code> version.</li>
+    <li>Y points up in the world and down on the screen.</li>
+    <li>Create objects with <code>Scene::Add</code>. Never <code>new</code> or <code>delete</code> a GameObject.</li>
+    <li>Whoever calls <code>Add</code> calls <code>Remove</code>, usually in <code>Uninitialize</code>. Set your pointer to <code>nullptr</code> afterwards.</li>
+  </ul>
+</section>
+</main>
+</div>
+</body>
+</html>
