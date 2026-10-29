@@ -93,7 +93,6 @@
     <ClCompile Include="SceneTests.cpp" />
     <ClCompile Include="CameraTests.cpp" />
     <ClCompile Include="TimeControlTests.cpp" />
-    <ClCompile Include="FixedTimestepTests.cpp" />
     <ClCompile Include="GameBaseTests.cpp" />
     <ClCompile Include="VisualTest.cpp" />
     <ClCompile Include="VisualTests.cpp" />
