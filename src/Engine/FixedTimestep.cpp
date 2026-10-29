@@ -1,17 +1,12 @@
 #include "FixedTimestep.h"
 
-#include <algorithm>
-
 int FixedTimestep::Advance(float elapsedTime)
 {
-    _Accumulator += std::clamp(elapsedTime, 0.0f, MaxFrameTime);
+    // TODO (class): write the accumulator.
+    //  - Add the frame time to _Accumulator. Cut a very long frame to MaxFrameTime first,
+    //    so the game does not try to catch up with hundreds of steps at once.
+    //  - Count how many steps of DeltaTime the accumulator holds, and remove them from it.
+    //  - Return that count: the engine runs one FixedUpdate for each step.
 
-    int stepCount = 0;
-    while (_Accumulator >= DeltaTime)
-    {
-        _Accumulator -= DeltaTime;
-        ++stepCount;
-    }
-
-    return stepCount;
+    return 0;
 }
